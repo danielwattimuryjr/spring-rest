@@ -1,0 +1,21 @@
+{
+  "name": "Spring Boot Dev Environment",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack", // Extension pack utama untuk Java (Debugger, Maven, dll)
+        "vmware.vscode-spring-boot", // Dukungan autocomplete & navigasi Spring Boot
+        "vscjava.vscode-spring-initializr", // Membuat proyek Spring langsung dari VS Code
+        "vscjava.vscode-spring-boot-dashboard", // Panel monitoring aplikasi Spring Boot
+        "vscjava.vscode-lombok", // Jika Anda menggunakan library Lombok
+        "cweijan.vscode-mysql-client2" // Client MySQL: browse table, run query, dsb
+        // "ms-azuretools.vscode-docker", // Mengelola container langsung dari VS Code
+        // "eamodio.gitlens" // Opsional: manajemen Git yang powerful
+      ]
+    }
+  },
+  "remoteUser": "root"
+}
