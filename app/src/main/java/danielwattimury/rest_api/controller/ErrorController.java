@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import danielwattimury.rest_api.model.WebResponse;
 
@@ -35,4 +36,14 @@ public class ErrorController {
                         .build());
     }
 
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<WebResponse<String>> noHandlerFoundException(NoHandlerFoundException exception) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(WebResponse
+                        .<String>builder()
+                        .status("error")
+                        .message("Endpoint not found: " + exception.getRequestURL())
+                        .build());
+    }
 }
