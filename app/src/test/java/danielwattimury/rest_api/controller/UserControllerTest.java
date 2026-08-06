@@ -60,6 +60,7 @@ public class UserControllerTest {
                             new TypeReference<WebResponse<RegisterUserResponse>>() {
                             });
 
+                    assertEquals("success", response.getStatus());
                     assertEquals("John Doe", response.getData().getName());
                     assertEquals("john_doe", response.getData().getUsername());
                 });

@@ -122,6 +122,10 @@ public class AuthenticationControllerTest {
                     assertEquals("success", response.getStatus());
                     assertNotNull(response.getData().getToken());
                     assertNotNull(response.getData().getTokenExpiredAt());
+
+                    User userDb = userRepository.findById("john_doe").orElse(null);
+                    assertNotNull(userDb);
+                    assertEquals(userDb.getToken(), response.getData().getToken());
                 });
     }
 }
