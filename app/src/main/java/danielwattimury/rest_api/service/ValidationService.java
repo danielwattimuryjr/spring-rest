@@ -1,0 +1,28 @@
+package danielwattimury.rest_api.service;
+
+import java.util.Set;
+
+import org.springframework.stereotype.Service;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
+import lombok.Getter;
+
+@Service
+public class ValidationService {
+
+    @Getter
+    private Validator validator;
+
+    public ValidationService(Validator validator) {
+        this.validator = validator;
+    }
+
+    public void validate(Object request) {
+        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(request);
+        if (constraintViolations.size() != 0) {
+            throw new ConstraintViolationException(constraintViolations);
+        }
+    }
+}

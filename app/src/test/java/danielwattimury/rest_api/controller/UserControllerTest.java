@@ -1,10 +1,8 @@
 package danielwattimury.rest_api.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.MockMvcBuilder.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +12,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import danielwattimury.rest_api.constants.ApiConstants;
 import danielwattimury.rest_api.model.RegisterUserRequest;
+import danielwattimury.rest_api.model.RegisterUserResponse;
 import danielwattimury.rest_api.model.WebResponse;
 import danielwattimury.rest_api.repository.UserRepository;
 import tools.jackson.core.type.TypeReference;
@@ -48,19 +48,20 @@ public class UserControllerTest {
         String jsonRequest = objectMapper.writeValueAsString(registerUserRequest);
 
         mockMvc.perform(
-                post("/api/users")
+                post(ApiConstants.API_BASE_PATH + "/users")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpectAll(
                         status().isOk())
                 .andDo(result -> {
-                    WebResponse<String> response = objectMapper.readValue(
+                    WebResponse<RegisterUserResponse> response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<>() {
+                            new TypeReference<WebResponse<RegisterUserResponse>>() {
                             });
 
-                    assertEquals("OK", response.getData());
+                    assertEquals("John Doe", response.getData().getName());
+                    assertEquals("john_doe", response.getData().getUsername());
                 });
     }
 
