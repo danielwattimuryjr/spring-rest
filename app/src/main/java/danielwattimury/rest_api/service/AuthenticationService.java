@@ -14,7 +14,8 @@ import danielwattimury.rest_api.model.LoginUserResponse;
 import danielwattimury.rest_api.model.RegisterUserRequest;
 import danielwattimury.rest_api.model.RegisterUserResponse;
 import danielwattimury.rest_api.repository.UserRepository;
-import danielwattimury.rest_api.service.JwtService.JWTToken;
+import danielwattimury.rest_api.security.JwtService;
+import danielwattimury.rest_api.security.JwtService.JWTToken;
 import jakarta.transaction.Transactional;
 
 @Service

@@ -1,4 +1,4 @@
-package danielwattimury.rest_api.service;
+package danielwattimury.rest_api.security;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

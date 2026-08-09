@@ -1,4 +1,4 @@
-package danielwattimury.rest_api.entity;
+package danielwattimury.rest_api.security;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -7,6 +7,8 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import danielwattimury.rest_api.entity.User;
 
 public class UserPrincipal implements UserDetails {
     private User user;

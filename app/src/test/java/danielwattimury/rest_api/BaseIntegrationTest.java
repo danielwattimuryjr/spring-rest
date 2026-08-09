@@ -14,7 +14,7 @@ import danielwattimury.rest_api.constants.ApiConstants;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.model.LoginUserRequest;
 import danielwattimury.rest_api.repository.UserRepository;
-import danielwattimury.rest_api.service.JwtService;
+import danielwattimury.rest_api.security.JwtService;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest

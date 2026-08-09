@@ -1,8 +1,7 @@
-package danielwattimury.rest_api.filter;
+package danielwattimury.rest_api.security;
 
 import java.io.IOException;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import danielwattimury.rest_api.service.CustomUserDetailsService;
-import danielwattimury.rest_api.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,11 +20,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private JwtService jwtService;
 
-    ApplicationContext context;
+    private final CustomUserDetailsService userDetailsService;
 
-    public JwtFilter(JwtService jwtService, ApplicationContext context) {
+    public JwtFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
         this.jwtService = jwtService;
-        this.context = context;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -42,7 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = context.getBean(CustomUserDetailsService.class).loadUserByUsername(username);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (jwtService.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,

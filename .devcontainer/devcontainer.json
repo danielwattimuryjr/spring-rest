@@ -18,5 +18,9 @@
       ]
     }
   },
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/tmp/host-ssh,type=bind,consistency=cached"
+  ],
+  "postCreateCommand": "mkdir -p /root/.ssh && cp -r /tmp/host-ssh/. /root/.ssh/ && chown -R root:root /root/.ssh && find /root/.ssh -type f -name 'id_*' ! -name '*.pub' -exec chmod 600 {} \\; && find /root/.ssh -type f -name '*.pub' -exec chmod 644 {} \\; && chmod 600 /root/.ssh/config && chmod 700 /root/.ssh",
   "remoteUser": "root"
 }

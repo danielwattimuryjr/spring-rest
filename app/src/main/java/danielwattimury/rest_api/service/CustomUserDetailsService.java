@@ -6,8 +6,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import danielwattimury.rest_api.entity.User;
-import danielwattimury.rest_api.entity.UserPrincipal;
 import danielwattimury.rest_api.repository.UserRepository;
+import danielwattimury.rest_api.security.UserPrincipal;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
