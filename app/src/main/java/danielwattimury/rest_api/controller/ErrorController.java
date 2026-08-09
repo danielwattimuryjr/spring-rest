@@ -60,4 +60,13 @@ public class ErrorController {
                                                 .message("Endpoint not found: " + exception.getRequestURL())
                                                 .build());
         }
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<WebResponse<String>> handleGeneric(Exception ex) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(WebResponse.<String>builder()
+                                                .status("error")
+                                                .message("An unexpected error occurred")
+                                                .build());
+        }
 }
