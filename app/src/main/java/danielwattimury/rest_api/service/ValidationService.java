@@ -7,12 +7,10 @@ import org.springframework.stereotype.Service;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
-import lombok.Getter;
 
 @Service
 public class ValidationService {
 
-    @Getter
     private Validator validator;
 
     public ValidationService(Validator validator) {

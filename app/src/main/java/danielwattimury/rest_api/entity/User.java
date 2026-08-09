@@ -2,7 +2,6 @@ package danielwattimury.rest_api.entity;
 
 import java.util.List;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -25,11 +24,6 @@ public class User {
     private String password;
 
     private String name;
-
-    private String token;
-
-    @Column(name = "token_expired_at")
-    private Long tokenExpiredAt;
 
     @OneToMany(mappedBy = "user")
     private List<Contact> contacts;

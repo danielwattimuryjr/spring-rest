@@ -1,6 +1,10 @@
 package danielwattimury.rest_api.controller;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,36 +18,46 @@ import danielwattimury.rest_api.model.WebResponse;
 @RestControllerAdvice
 public class ErrorController {
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<WebResponse<String>> constraintViolationException(ConstraintViolationException exception) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(WebResponse
-                        .<String>builder()
-                        .status("error")
-                        .message(exception.getMessage())
-                        .build());
-    };
+        @ExceptionHandler(ConstraintViolationException.class)
+        public ResponseEntity<WebResponse<Map<String, String>>> constraintViolationException(
+                        ConstraintViolationException exception) {
+                Map<String, String> errors = new HashMap<>();
 
-    @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<WebResponse<String>> apiException(ResponseStatusException exception) {
-        return ResponseEntity
-                .status(exception.getStatusCode())
-                .body(WebResponse
-                        .<String>builder()
-                        .status("error")
-                        .message(exception.getReason())
-                        .build());
-    }
+                for (ConstraintViolation<?> violation : exception.getConstraintViolations()) {
+                        errors.put(
+                                        violation.getPropertyPath().toString(),
+                                        violation.getMessage());
+                }
 
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<WebResponse<String>> noHandlerFoundException(NoHandlerFoundException exception) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(WebResponse
-                        .<String>builder()
-                        .status("error")
-                        .message("Endpoint not found: " + exception.getRequestURL())
-                        .build());
-    }
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(WebResponse
+                                                .<Map<String, String>>builder()
+                                                .status("error")
+                                                .message("Validation failed")
+                                                .data(errors)
+                                                .build());
+        };
+
+        @ExceptionHandler(ResponseStatusException.class)
+        public ResponseEntity<WebResponse<String>> apiException(ResponseStatusException exception) {
+                return ResponseEntity
+                                .status(exception.getStatusCode())
+                                .body(WebResponse
+                                                .<String>builder()
+                                                .status("error")
+                                                .message(exception.getReason())
+                                                .build());
+        }
+
+        @ExceptionHandler(NoHandlerFoundException.class)
+        public ResponseEntity<WebResponse<String>> noHandlerFoundException(NoHandlerFoundException exception) {
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(WebResponse
+                                                .<String>builder()
+                                                .status("error")
+                                                .message("Endpoint not found: " + exception.getRequestURL())
+                                                .build());
+        }
 }
