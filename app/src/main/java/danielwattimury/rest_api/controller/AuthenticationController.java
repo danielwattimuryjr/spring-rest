@@ -9,7 +9,6 @@ import danielwattimury.rest_api.model.RegisterUserRequest;
 import danielwattimury.rest_api.model.RegisterUserResponse;
 import danielwattimury.rest_api.model.WebResponse;
 import danielwattimury.rest_api.service.AuthenticationService;
-import lombok.Getter;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    @Getter
     private AuthenticationService authenticationService;
 
     public AuthenticationController(AuthenticationService authenticationService) {

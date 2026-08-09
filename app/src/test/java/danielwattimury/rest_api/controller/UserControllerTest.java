@@ -4,66 +4,57 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
+import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
-import danielwattimury.rest_api.model.RegisterUserRequest;
-import danielwattimury.rest_api.model.RegisterUserResponse;
+import danielwattimury.rest_api.model.GetCurrentUserResponse;
+import danielwattimury.rest_api.model.LoginUserRequest;
+import danielwattimury.rest_api.model.LoginUserResponse;
 import danielwattimury.rest_api.model.WebResponse;
-import danielwattimury.rest_api.repository.UserRepository;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class UserControllerTest {
+public class UserControllerTest extends BaseIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        userRepository.deleteAll();
+    @Test
+    void testEmptyJwtToken() throws Exception {
+        mockMvc.perform(
+                get(ApiConstants.API_BASE_PATH + "/users/current")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void testRegisterSuccess() throws Exception {
-        RegisterUserRequest registerUserRequest = new RegisterUserRequest();
-        registerUserRequest.setName("John Doe");
-        registerUserRequest.setUsername("john_doe");
-        registerUserRequest.setPassword("password123");
+    void getCurrentUser() throws Exception {
+        registerUser();
 
-        String jsonRequest = objectMapper.writeValueAsString(registerUserRequest);
+        LoginUserRequest loginRequest = new LoginUserRequest();
+        loginRequest.setUsername("john_doe");
+        loginRequest.setPassword("password123");
 
-        mockMvc.perform(
-                post(ApiConstants.API_BASE_PATH + "/users")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
-                .andExpectAll(
-                        status().isOk())
-                .andDo(result -> {
-                    WebResponse<RegisterUserResponse> response = objectMapper.readValue(
-                            result.getResponse().getContentAsString(),
-                            new TypeReference<WebResponse<RegisterUserResponse>>() {
-                            });
+        mockLoginRequest(loginRequest).andExpect(status().isOk()).andDo(result -> {
+            WebResponse<LoginUserResponse> response = objectMapper.readValue(
+                    result.getResponse().getContentAsString(),
+                    new TypeReference<WebResponse<LoginUserResponse>>() {
+                    });
 
-                    assertEquals("success", response.getStatus());
-                    assertEquals("John Doe", response.getData().getName());
-                    assertEquals("john_doe", response.getData().getUsername());
-                });
+            mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/users/current")
+                    .header("Authorization", "Bearer " + response.getData().getToken())
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andDo(currentUserResult -> {
+                        WebResponse<GetCurrentUserResponse> currentUserResponse = objectMapper.readValue(
+                                currentUserResult.getResponse().getContentAsString(),
+                                new TypeReference<WebResponse<GetCurrentUserResponse>>() {
+                                });
+
+                        assertEquals(loginRequest.getUsername(), currentUserResponse.getData().getUsername());
+                    });
+        });
     }
-
 }

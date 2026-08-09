@@ -42,8 +42,12 @@ public class JwtService {
     }
 
     public JWTToken generateToken(String username) {
+        Instant expiration = Instant.now().plus(30, ChronoUnit.MINUTES);
+        return generateToken(username, expiration);
+    }
+
+    public JWTToken generateToken(String username, Instant expiration) {
         Instant now = Instant.now();
-        Instant expiration = now.plus(30, ChronoUnit.MINUTES);
         Map<String, Object> claims = new HashMap<>();
 
         String token = Jwts.builder()
@@ -64,6 +68,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    @SuppressWarnings("null")
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -90,6 +95,7 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
+    @SuppressWarnings("null")
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
