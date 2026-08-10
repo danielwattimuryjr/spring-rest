@@ -104,7 +104,7 @@ public class UserControllerTest extends BaseIntegrationTest {
                     });
         });
 
-        User updatedUser = userRepository.findById("john_doe").orElseThrow();
+        User updatedUser = userRepository.findByUsername("john_doe").orElseThrow();
         assertEquals("john_doe_updated", updatedUser.getName());
     }
 }

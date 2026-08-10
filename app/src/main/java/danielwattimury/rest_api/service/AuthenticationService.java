@@ -64,7 +64,7 @@ public class AuthenticationService {
     public RegisterUserResponse register(RegisterUserRequest request) {
         validationService.validate(request);
 
-        if (userRepository.existsById(request.getUsername())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already taken");
         }
 

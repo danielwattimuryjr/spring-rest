@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -82,6 +83,17 @@ public class ErrorController {
                                 .body(WebResponse.<String>builder()
                                                 .status("error")
                                                 .message("Access denied: you do not have permission to perform this action")
+                                                .build());
+        }
+
+        @ExceptionHandler(BadCredentialsException.class)
+        public ResponseEntity<WebResponse<String>> badCredentialsException(
+                        BadCredentialsException exception) {
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(WebResponse.<String>builder()
+                                                .status("error")
+                                                .message("Username or password wrong")
                                                 .build());
         }
 }

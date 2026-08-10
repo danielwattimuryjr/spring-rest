@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -23,6 +24,11 @@ import tools.jackson.core.type.TypeReference;
 @AutoConfigureMockMvc
 public class AuthenticationControllerTest extends BaseIntegrationTest {
 
+        @BeforeEach
+        void setUp() {
+                userRepository.deleteAll();
+        }
+
         @Test
         void testLoginFailedUserNotFound() throws Exception {
                 LoginUserRequest loginRequest = new LoginUserRequest();
@@ -30,7 +36,7 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                 loginRequest.setPassword("wrong_password");
 
                 mockLoginRequest(loginRequest).andExpectAll(
-                                status().isUnauthorized());
+                                status().isBadRequest());
         }
 
         @Test
@@ -42,7 +48,7 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                 loginRequest.setPassword("wrong_password");
 
                 mockLoginRequest(loginRequest).andExpectAll(
-                                status().isUnauthorized());
+                                status().isBadRequest());
         }
 
         @Test
