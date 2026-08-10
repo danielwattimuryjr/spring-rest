@@ -1,11 +1,13 @@
 package danielwattimury.rest_api.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import danielwattimury.rest_api.entity.Contact;
 import danielwattimury.rest_api.entity.User;
-import danielwattimury.rest_api.model.PostContactRequest;
-import danielwattimury.rest_api.model.PostContactResponse;
+import danielwattimury.rest_api.model.ContactRequestDto;
+import danielwattimury.rest_api.model.ContactResponseDto;
 import danielwattimury.rest_api.repository.ContactRepository;
 import jakarta.transaction.Transactional;
 
@@ -26,7 +28,7 @@ public class ContactService {
     }
 
     @Transactional
-    public PostContactResponse createContact(PostContactRequest request, String username) {
+    public ContactResponseDto createContact(ContactRequestDto request, String username) {
         validationService.validate(request);
 
         User user = userService.getUserOrFail(username);
@@ -39,7 +41,31 @@ public class ContactService {
         contact.setUser(user);
         contactRepository.save(contact);
 
-        return PostContactResponse.builder()
+        return ContactResponseDto.builder()
+                .id(contact.getId())
+                .firstName(contact.getFirstName())
+                .lastName(contact.getLastName())
+                .phone(contact.getPhone())
+                .email(contact.getEmail())
+                .build();
+    }
+
+    public ContactResponseDto updateContact(ContactRequestDto request, String username, Integer idContanct) {
+        validationService.validate(request);
+
+        User user = userService.getUserOrFail(username);
+
+        Contact contact = contactRepository
+                .findByIdAndUserId(idContanct, user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
+
+        contact.setFirstName(request.getFirstName());
+        contact.setLastName(request.getLastName());
+        contact.setPhone(request.getPhone());
+        contact.setEmail(request.getEmail());
+        contactRepository.save(contact);
+
+        return ContactResponseDto.builder()
                 .id(contact.getId())
                 .firstName(contact.getFirstName())
                 .lastName(contact.getLastName())

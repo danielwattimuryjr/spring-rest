@@ -62,10 +62,8 @@ public class UserService {
     }
 
     public User getUserOrFail(String username) {
-        User user = userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        return user;
     }
 
 }
