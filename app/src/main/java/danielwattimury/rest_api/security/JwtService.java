@@ -70,8 +70,12 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    @SuppressWarnings("null")
     public String extractUsername(String token) {
+        return extractClaim(token, claims -> claims.get("username", String.class));
+    }
+
+    @SuppressWarnings("null")
+    public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 

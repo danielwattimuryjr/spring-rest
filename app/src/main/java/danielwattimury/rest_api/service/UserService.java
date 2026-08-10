@@ -28,8 +28,8 @@ public class UserService {
         this.validationService = validationService;
     }
 
-    public GetCurrentUserResponse get(String username) {
-        User user = userRepository.findByUsername(username)
+    public GetCurrentUserResponse get(Integer userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         return GetCurrentUserResponse.builder()
@@ -39,10 +39,10 @@ public class UserService {
     }
 
     @Transactional
-    public PatchCurrentUserResponse patch(String username, PatchCurrentUserRequest request) {
+    public PatchCurrentUserResponse patch(Integer userId, PatchCurrentUserRequest request) {
         validationService.validate(request);
 
-        User user = getUserOrFail(username);
+        User user = getUserOrFail(userId);
 
         if (Objects.nonNull(request.getName())) {
             user.setName(request.getName());
@@ -61,8 +61,8 @@ public class UserService {
                 .build();
     }
 
-    public User getUserOrFail(String username) {
-        return userRepository.findByUsername(username)
+    public User getUserOrFail(Integer userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 

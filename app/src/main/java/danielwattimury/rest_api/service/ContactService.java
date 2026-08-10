@@ -28,10 +28,10 @@ public class ContactService {
     }
 
     @Transactional
-    public ContactResponseDto createContact(ContactRequestDto request, String username) {
+    public ContactResponseDto createContact(ContactRequestDto request, Integer userId) {
         validationService.validate(request);
 
-        User user = userService.getUserOrFail(username);
+        User user = userService.getUserOrFail(userId);
 
         Contact contact = new Contact();
         contact.setFirstName(request.getFirstName());
@@ -51,13 +51,11 @@ public class ContactService {
     }
 
     @Transactional
-    public ContactResponseDto updateContact(ContactRequestDto request, String username, Integer idContanct) {
+    public ContactResponseDto updateContact(ContactRequestDto request, Integer userId, Integer contactId) {
         validationService.validate(request);
 
-        User user = userService.getUserOrFail(username);
-
         Contact contact = contactRepository
-                .findByIdAndUserId(idContanct, user.getId())
+                .findByIdAndUserId(contactId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
 
         contact.setFirstName(request.getFirstName());
