@@ -2,6 +2,7 @@ package danielwattimury.rest_api.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,6 +19,7 @@ import danielwattimury.rest_api.constants.ApiConstants;
 import danielwattimury.rest_api.entity.Contact;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.model.ContactRequestDto;
+import danielwattimury.rest_api.model.ContactResponseDto;
 import danielwattimury.rest_api.model.WebResponse;
 import tools.jackson.core.type.TypeReference;
 
@@ -129,6 +131,44 @@ public class ContactControllerTest extends BaseIntegrationTest {
         assertEquals(
                 sampleUser.getUsername(),
                 updatedContact.getUser().getUsername());
+    }
+
+    @Test
+    void testGetOneSuccess() throws Exception {
+        String token = loginAndGetToken(sampleUser.getUsername(), DEFAULT_PASSWORD);
+
+        // Create initial contact
+        Contact contact = new Contact();
+
+        contact.setFirstName("John");
+        contact.setLastName("Doe");
+        contact.setEmail("john@example.com");
+        contact.setPhone("081111111111");
+        contact.setUser(sampleUser);
+        Contact savedContact = contactRepository.save(contact);
+
+        mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/contacts/" + savedContact.getId())
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andDo(result -> {
+                    WebResponse<ContactResponseDto> response = objectMapper.readValue(
+                            result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponse<ContactResponseDto>>() {
+                            });
+
+                    assertEquals("success", response.getStatus());
+                    assertEquals(
+                            "Contact retrieved successfully",
+                            response.getMessage());
+
+                    ContactResponseDto data = response.getData();
+
+                    assertEquals("John", data.getFirstName());
+                    assertEquals("Doe", data.getLastName());
+                    assertEquals("john@example.com", data.getEmail());
+                    assertEquals("081111111111", data.getPhone());
+                });
+
     }
 
 }

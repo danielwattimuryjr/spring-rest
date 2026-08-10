@@ -73,4 +73,18 @@ public class ContactService {
                 .build();
     }
 
+    public ContactResponseDto getContactById(Integer userId, Integer contactId) {
+        Contact contact = contactRepository
+                .findByIdAndUserId(contactId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
+
+        return ContactResponseDto.builder()
+                .id(contact.getId())
+                .firstName(contact.getFirstName())
+                .lastName(contact.getLastName())
+                .phone(contact.getPhone())
+                .email(contact.getEmail())
+                .build();
+    }
+
 }

@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -53,6 +54,20 @@ public class ContactController {
                 .body(WebResponse.<ContactResponseDto>builder()
                         .status("success")
                         .message("Contact updated successfully")
+                        .data(contact)
+                        .build());
+    }
+
+    @GetMapping(path = "/{contactId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponse<ContactResponseDto>> getOne(@PathVariable Integer contactId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        ContactResponseDto contact = contactService.getContactById(principal.getUserId(), contactId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(WebResponse.<ContactResponseDto>builder()
+                        .status("success")
+                        .message("Contact retrieved successfully")
                         .data(contact)
                         .build());
     }
