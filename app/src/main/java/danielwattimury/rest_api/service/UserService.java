@@ -42,8 +42,7 @@ public class UserService {
     public PatchCurrentUserResponse patch(String username, PatchCurrentUserRequest request) {
         validationService.validate(request);
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = getUserOrFail(username);
 
         if (Objects.nonNull(request.getName())) {
             user.setName(request.getName());
@@ -60,6 +59,13 @@ public class UserService {
                 .username(user.getUsername())
                 .name(user.getName())
                 .build();
+    }
+
+    public User getUserOrFail(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return user;
     }
 
 }
