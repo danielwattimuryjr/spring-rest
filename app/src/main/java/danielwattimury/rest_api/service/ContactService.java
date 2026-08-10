@@ -50,6 +50,7 @@ public class ContactService {
                 .build();
     }
 
+    @Transactional
     public ContactResponseDto updateContact(ContactRequestDto request, String username, Integer idContanct) {
         validationService.validate(request);
 
