@@ -2,12 +2,14 @@ package danielwattimury.rest_api.controller;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,6 +17,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import danielwattimury.rest_api.model.WebResponse;
 
+@Slf4j
 @RestControllerAdvice
 public class ErrorController {
 
@@ -63,10 +66,22 @@ public class ErrorController {
 
         @ExceptionHandler(Exception.class)
         public ResponseEntity<WebResponse<String>> handleGeneric(Exception ex) {
+                log.error("Unexpected error occurred", ex);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(WebResponse.<String>builder()
                                                 .status("error")
                                                 .message("An unexpected error occurred")
+                                                .build());
+        }
+
+        @ExceptionHandler(AuthorizationDeniedException.class)
+        public ResponseEntity<WebResponse<String>> authorizationDeniedException(
+                        AuthorizationDeniedException exception) {
+                return ResponseEntity
+                                .status(HttpStatus.FORBIDDEN)
+                                .body(WebResponse.<String>builder()
+                                                .status("error")
+                                                .message("Access denied: you do not have permission to perform this action")
                                                 .build());
         }
 }

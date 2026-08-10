@@ -8,11 +8,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
+import danielwattimury.rest_api.enums.RoleEnum;
 import danielwattimury.rest_api.model.LoginUserRequest;
 import danielwattimury.rest_api.model.LoginUserResponse;
 import danielwattimury.rest_api.model.RegisterUserRequest;
 import danielwattimury.rest_api.model.RegisterUserResponse;
+import danielwattimury.rest_api.repository.RoleRepository;
 import danielwattimury.rest_api.repository.UserRepository;
 import danielwattimury.rest_api.security.JwtService;
 import danielwattimury.rest_api.security.JwtService.JWTToken;
@@ -23,6 +26,8 @@ public class AuthenticationService {
 
     private UserRepository userRepository;
 
+    private RoleRepository roleRepository;
+
     private ValidationService validationService;
 
     private AuthenticationManager authenticationManager;
@@ -32,11 +37,12 @@ public class AuthenticationService {
     private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
 
     public AuthenticationService(UserRepository userRepository, ValidationService validationService,
-            AuthenticationManager authenticationManager, JwtService jwtService) {
+            AuthenticationManager authenticationManager, JwtService jwtService, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.validationService = validationService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.roleRepository = roleRepository;
     }
 
     @Transactional
@@ -62,10 +68,15 @@ public class AuthenticationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already taken");
         }
 
+        Role optionalRole = roleRepository.findByName(RoleEnum.USER)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Role with name: " + RoleEnum.USER + " is not found"));
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
         user.setName(request.getName());
+        user.setRole(optionalRole);
 
         userRepository.save(user);
 
