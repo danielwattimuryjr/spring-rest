@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,13 +34,31 @@ public class AddressController {
             @PathVariable Integer contactId,
             @RequestBody AddressRequestDto request) {
         request.setContactId(contactId);
-        AddressResponseDto address = addressService.createAddress(request, contactId, principal.getUserId());
+        AddressResponseDto address = addressService.createAddress(request, principal.getUserId());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(WebResponseDto.<AddressResponseDto>builder()
                         .status(ResponseStatus.SUCCESS)
                         .message("Address created successfully")
+                        .data(address)
+                        .build());
+    }
+
+    @PutMapping(path = "/{addressId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebResponseDto<AddressResponseDto>> post(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Integer contactId,
+            @PathVariable Integer addressId,
+            @RequestBody AddressRequestDto request) {
+        request.setContactId(contactId);
+        AddressResponseDto address = addressService.updateAddress(request, addressId, principal.getUserId());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(WebResponseDto.<AddressResponseDto>builder()
+                        .status(ResponseStatus.SUCCESS)
+                        .message("Address updated successfully")
                         .data(address)
                         .build());
     }

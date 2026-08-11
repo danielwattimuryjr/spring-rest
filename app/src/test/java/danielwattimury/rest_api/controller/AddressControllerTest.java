@@ -3,6 +3,7 @@ package danielwattimury.rest_api.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
@@ -38,6 +39,18 @@ public class AddressControllerTest extends BaseIntegrationTest {
         contact.setPhone(phone);
         contact.setUser(sampleUser);
         return contactRepository.save(contact);
+    }
+
+    private Address createAddress(Contact contact) {
+        Address address = new Address();
+        address.setCity("Denpasar");
+        address.setCountry("Indonesia");
+        address.setPostalCode("80225");
+        address.setProvince("Bali");
+        address.setStreet("Jl. Sunset Road");
+        address.setContact(contact);
+
+        return addressRepository.save(address);
     }
 
     @BeforeEach
@@ -107,4 +120,46 @@ public class AddressControllerTest extends BaseIntegrationTest {
         assertEquals(1, addresses.size());
         assertEquals(sampleContact.getId(), addresses.get(0).getContact().getId());
     }
+
+    @Test
+    void testPutSuccess() throws Exception {
+        // Arrange
+        Address address = createAddress(sampleContact);
+
+        AddressRequestDto request = new AddressRequestDto();
+        request.setCity("Badung");
+        request.setPostalCode("80361");
+        request.setProvince("Bali");
+        request.setStreet("Jl. Raya Kuta");
+        request.setCountry("Indonesia");
+
+        // Act & Assert
+        mockMvc.perform(
+                put(ApiConstants.API_BASE_PATH
+                        + "/contacts/{contactId}/addresses/{addressId}",
+                        sampleContact.getId(),
+                        address.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        // Verify database
+        Address updatedAddress = addressRepository
+                .findById(address.getId())
+                .orElseThrow();
+
+        assertEquals("Badung", updatedAddress.getCity());
+        assertEquals("80361", updatedAddress.getPostalCode());
+        assertEquals("Bali", updatedAddress.getProvince());
+        assertEquals("Jl. Raya Kuta", updatedAddress.getStreet());
+        assertEquals("Indonesia", updatedAddress.getCountry());
+
+        // Make sure ownership didn't change
+        assertEquals(
+                sampleContact.getId(),
+                updatedAddress.getContact().getId());
+    }
+
 }

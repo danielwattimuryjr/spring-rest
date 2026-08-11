@@ -39,10 +39,10 @@ public class AddressService {
     }
 
     @Transactional
-    public AddressResponseDto createAddress(AddressRequestDto request, Integer contactId, Integer userId) {
+    public AddressResponseDto createAddress(AddressRequestDto request, Integer userId) {
         validationService.validate(request);
 
-        Contact contact = contactRepository.findByIdAndUserId(contactId, userId)
+        Contact contact = contactRepository.findByIdAndUserId(request.getContactId(), userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Contact not found"));
 
@@ -56,6 +56,27 @@ public class AddressService {
         Address savedAddress = addressRepository.save(address);
 
         return toAddressResponse(savedAddress);
+    }
+
+    @Transactional
+    public AddressResponseDto updateAddress(AddressRequestDto request, Integer addressId, Integer userId) {
+        validationService.validate(request);
+
+        Contact contact = contactRepository.findByIdAndUserId(request.getContactId(), userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Contact not found"));
+        Address address = addressRepository.findFirstByContactAndId(contact, addressId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Address not found"));
+
+        address.setCity(request.getCity());
+        address.setCountry(request.getCountry());
+        address.setPostalCode(request.getPostalCode());
+        address.setProvince(request.getProvince());
+        address.setStreet(request.getStreet());
+        addressRepository.save(address);
+
+        return toAddressResponse(address);
     }
 
 }
