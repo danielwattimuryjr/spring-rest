@@ -13,12 +13,12 @@ import org.springframework.http.MediaType;
 
 import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
+import danielwattimury.rest_api.dto.LoginUserRequest;
+import danielwattimury.rest_api.dto.LoginUserResponse;
+import danielwattimury.rest_api.dto.RegisterUserRequest;
+import danielwattimury.rest_api.dto.UserResponseDto;
+import danielwattimury.rest_api.dto.WebResponse;
 import danielwattimury.rest_api.enums.ResponseStatus;
-import danielwattimury.rest_api.model.LoginUserRequest;
-import danielwattimury.rest_api.model.LoginUserResponse;
-import danielwattimury.rest_api.model.RegisterUserRequest;
-import danielwattimury.rest_api.model.RegisterUserResponse;
-import danielwattimury.rest_api.model.WebResponse;
 import tools.jackson.core.type.TypeReference;
 
 @SpringBootTest
@@ -96,9 +96,9 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                                 .andExpectAll(
                                                 status().isOk())
                                 .andDo(result -> {
-                                        WebResponse<RegisterUserResponse> response = objectMapper.readValue(
+                                        WebResponse<UserResponseDto> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponse<RegisterUserResponse>>() {
+                                                        new TypeReference<WebResponse<UserResponseDto>>() {
                                                         });
 
                                         assertEquals(ResponseStatus.SUCCESS, response.getStatus());

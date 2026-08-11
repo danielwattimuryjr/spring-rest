@@ -18,14 +18,14 @@ import org.springframework.http.MediaType;
 
 import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
+import danielwattimury.rest_api.dto.ContactRequestDto;
+import danielwattimury.rest_api.dto.ContactResponseDto;
+import danielwattimury.rest_api.dto.WebResponse;
 import danielwattimury.rest_api.entity.Contact;
 import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.enums.RoleEnum;
-import danielwattimury.rest_api.model.ContactRequestDto;
-import danielwattimury.rest_api.model.ContactResponseDto;
-import danielwattimury.rest_api.model.WebResponse;
 import tools.jackson.core.type.TypeReference;
 
 public class ContactControllerTest extends BaseIntegrationTest {

@@ -7,10 +7,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import danielwattimury.rest_api.dto.PatchCurrentUserRequest;
+import danielwattimury.rest_api.dto.UserResponseDto;
 import danielwattimury.rest_api.entity.User;
-import danielwattimury.rest_api.model.GetCurrentUserResponse;
-import danielwattimury.rest_api.model.PatchCurrentUserRequest;
-import danielwattimury.rest_api.model.PatchCurrentUserResponse;
 import danielwattimury.rest_api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
@@ -28,18 +27,18 @@ public class UserService {
         this.validationService = validationService;
     }
 
-    public GetCurrentUserResponse get(Integer userId) {
+    public UserResponseDto get(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        return GetCurrentUserResponse.builder()
+        return UserResponseDto.builder()
                 .name(user.getName())
                 .username(user.getUsername())
                 .build();
     }
 
     @Transactional
-    public PatchCurrentUserResponse patch(Integer userId, PatchCurrentUserRequest request) {
+    public UserResponseDto patch(Integer userId, PatchCurrentUserRequest request) {
         validationService.validate(request);
 
         User user = getUserOrFail(userId);
@@ -55,7 +54,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        return PatchCurrentUserResponse.builder()
+        return UserResponseDto.builder()
                 .username(user.getUsername())
                 .name(user.getName())
                 .build();

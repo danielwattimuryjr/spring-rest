@@ -1,6 +1,4 @@
-package danielwattimury.rest_api.model;
-
-import java.time.Instant;
+package danielwattimury.rest_api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LoginUserResponse {
-    private String token;
-    private Instant tokenExpiredAt;
+public class PagingResponse {
+
+    private Integer currentPage;
+
+    private Integer totalPage;
+
+    private Integer size;
+
 }

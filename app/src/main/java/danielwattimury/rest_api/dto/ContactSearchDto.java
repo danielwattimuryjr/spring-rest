@@ -1,4 +1,4 @@
-package danielwattimury.rest_api.model;
+package danielwattimury.rest_api.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

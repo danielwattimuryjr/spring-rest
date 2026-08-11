@@ -12,14 +12,13 @@ import org.springframework.http.MediaType;
 
 import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
+import danielwattimury.rest_api.dto.UserResponseDto;
+import danielwattimury.rest_api.dto.LoginUserRequest;
+import danielwattimury.rest_api.dto.LoginUserResponse;
+import danielwattimury.rest_api.dto.PatchCurrentUserRequest;
+import danielwattimury.rest_api.dto.WebResponse;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.ResponseStatus;
-import danielwattimury.rest_api.model.GetCurrentUserResponse;
-import danielwattimury.rest_api.model.LoginUserRequest;
-import danielwattimury.rest_api.model.LoginUserResponse;
-import danielwattimury.rest_api.model.PatchCurrentUserRequest;
-import danielwattimury.rest_api.model.PatchCurrentUserResponse;
-import danielwattimury.rest_api.model.WebResponse;
 import tools.jackson.core.type.TypeReference;
 
 @SpringBootTest
@@ -58,9 +57,9 @@ public class UserControllerTest extends BaseIntegrationTest {
                     .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andDo(currentUserResult -> {
-                        WebResponse<GetCurrentUserResponse> currentUserResponse = objectMapper.readValue(
+                        WebResponse<UserResponseDto> currentUserResponse = objectMapper.readValue(
                                 currentUserResult.getResponse().getContentAsString(),
-                                new TypeReference<WebResponse<GetCurrentUserResponse>>() {
+                                new TypeReference<WebResponse<UserResponseDto>>() {
                                 });
 
                         assertEquals(loginRequest.getUsername(), currentUserResponse.getData().getUsername());
@@ -94,9 +93,9 @@ public class UserControllerTest extends BaseIntegrationTest {
                     .content(jsonRequest))
                     .andExpect(status().isOk())
                     .andDo(currentUserResult -> {
-                        WebResponse<PatchCurrentUserResponse> currentUserResponse = objectMapper.readValue(
+                        WebResponse<UserResponseDto> currentUserResponse = objectMapper.readValue(
                                 currentUserResult.getResponse().getContentAsString(),
-                                new TypeReference<WebResponse<PatchCurrentUserResponse>>() {
+                                new TypeReference<WebResponse<UserResponseDto>>() {
                                 });
 
                         assertEquals(ResponseStatus.SUCCESS, currentUserResponse.getStatus());

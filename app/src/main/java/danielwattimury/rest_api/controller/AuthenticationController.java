@@ -3,12 +3,12 @@ package danielwattimury.rest_api.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import danielwattimury.rest_api.dto.LoginUserRequest;
+import danielwattimury.rest_api.dto.LoginUserResponse;
+import danielwattimury.rest_api.dto.RegisterUserRequest;
+import danielwattimury.rest_api.dto.UserResponseDto;
+import danielwattimury.rest_api.dto.WebResponse;
 import danielwattimury.rest_api.enums.ResponseStatus;
-import danielwattimury.rest_api.model.LoginUserRequest;
-import danielwattimury.rest_api.model.LoginUserResponse;
-import danielwattimury.rest_api.model.RegisterUserRequest;
-import danielwattimury.rest_api.model.RegisterUserResponse;
-import danielwattimury.rest_api.model.WebResponse;
 import danielwattimury.rest_api.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -46,11 +46,11 @@ public class AuthenticationController {
     @Operation(summary = "Register user", description = "Create a user and sotre it into DB")
     @SecurityRequirements
     @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public WebResponse<RegisterUserResponse> register(@RequestBody RegisterUserRequest request) {
-        RegisterUserResponse registerUserResponse = authenticationService.register(request);
+    public WebResponse<UserResponseDto> register(@RequestBody RegisterUserRequest request) {
+        UserResponseDto registerUserResponse = authenticationService.register(request);
 
         return WebResponse
-                .<RegisterUserResponse>builder()
+                .<UserResponseDto>builder()
                 .status(ResponseStatus.SUCCESS)
                 .message("User Created Successfully")
                 .data(registerUserResponse)

@@ -13,11 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import danielwattimury.rest_api.dto.ContactRequestDto;
+import danielwattimury.rest_api.dto.ContactResponseDto;
+import danielwattimury.rest_api.dto.ContactSearchDto;
 import danielwattimury.rest_api.entity.Contact;
 import danielwattimury.rest_api.entity.User;
-import danielwattimury.rest_api.model.ContactRequestDto;
-import danielwattimury.rest_api.model.ContactResponseDto;
-import danielwattimury.rest_api.model.ContactSearchDto;
 import danielwattimury.rest_api.repository.ContactRepository;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;

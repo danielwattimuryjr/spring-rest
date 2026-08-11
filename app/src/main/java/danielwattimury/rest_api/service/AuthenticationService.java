@@ -8,13 +8,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import danielwattimury.rest_api.dto.LoginUserRequest;
+import danielwattimury.rest_api.dto.LoginUserResponse;
+import danielwattimury.rest_api.dto.RegisterUserRequest;
+import danielwattimury.rest_api.dto.UserResponseDto;
 import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.RoleEnum;
-import danielwattimury.rest_api.model.LoginUserRequest;
-import danielwattimury.rest_api.model.LoginUserResponse;
-import danielwattimury.rest_api.model.RegisterUserRequest;
-import danielwattimury.rest_api.model.RegisterUserResponse;
 import danielwattimury.rest_api.repository.RoleRepository;
 import danielwattimury.rest_api.repository.UserRepository;
 import danielwattimury.rest_api.security.JwtService;
@@ -63,7 +63,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public RegisterUserResponse register(RegisterUserRequest request) {
+    public UserResponseDto register(RegisterUserRequest request) {
         validationService.validate(request);
 
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -82,7 +82,7 @@ public class AuthenticationService {
 
         userRepository.save(user);
 
-        return RegisterUserResponse.builder()
+        return UserResponseDto.builder()
                 .name(user.getName())
                 .username(user.getUsername())
                 .build();

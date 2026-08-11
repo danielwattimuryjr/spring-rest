@@ -1,4 +1,6 @@
-package danielwattimury.rest_api.model;
+package danielwattimury.rest_api.dto;
+
+import java.time.Instant;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RegisterUserResponse {
-    private String username;
-    private String name;
+public class LoginUserResponse {
+    private String token;
+    private Instant tokenExpiredAt;
 }

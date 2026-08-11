@@ -1,4 +1,4 @@
-package danielwattimury.rest_api.model;
+package danielwattimury.rest_api.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -11,16 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RegisterUserRequest {
+public class LoginUserRequest {
     @NotBlank
     @Size(max = 100)
     private String username;
 
     @NotBlank
-    @Size(max = 100)
+    @Size
     private String password;
-
-    @NotBlank
-    @Size(max = 100)
-    private String name;
 }

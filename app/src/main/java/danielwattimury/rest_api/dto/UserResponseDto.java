@@ -1,4 +1,4 @@
-package danielwattimury.rest_api.model;
+package danielwattimury.rest_api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,12 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PagingResponse {
+public class UserResponseDto {
 
-    private Integer currentPage;
+    private String username;
 
-    private Integer totalPage;
-
-    private Integer size;
+    private String name;
 
 }

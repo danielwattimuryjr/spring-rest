@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import danielwattimury.rest_api.dto.WebResponse;
 import danielwattimury.rest_api.enums.ResponseStatus;
-import danielwattimury.rest_api.model.WebResponse;
 
 @Slf4j
 @RestControllerAdvice

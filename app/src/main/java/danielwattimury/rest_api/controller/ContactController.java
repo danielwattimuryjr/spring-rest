@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import danielwattimury.rest_api.dto.ContactRequestDto;
+import danielwattimury.rest_api.dto.ContactResponseDto;
+import danielwattimury.rest_api.dto.ContactSearchDto;
+import danielwattimury.rest_api.dto.PagingResponse;
+import danielwattimury.rest_api.dto.WebResponse;
 import danielwattimury.rest_api.enums.ResponseStatus;
-import danielwattimury.rest_api.model.ContactRequestDto;
-import danielwattimury.rest_api.model.ContactResponseDto;
-import danielwattimury.rest_api.model.ContactSearchDto;
-import danielwattimury.rest_api.model.PagingResponse;
-import danielwattimury.rest_api.model.WebResponse;
 import danielwattimury.rest_api.security.UserPrincipal;
 import danielwattimury.rest_api.service.ContactService;
 
