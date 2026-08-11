@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import danielwattimury.rest_api.dto.ContactRequestDto;
 import danielwattimury.rest_api.dto.ContactResponseDto;
 import danielwattimury.rest_api.dto.ContactSearchDto;
-import danielwattimury.rest_api.dto.PagingResponse;
-import danielwattimury.rest_api.dto.WebResponse;
+import danielwattimury.rest_api.dto.PagingResponseDto;
+import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.security.UserPrincipal;
 import danielwattimury.rest_api.service.ContactService;
@@ -37,14 +37,14 @@ public class ContactController {
         }
 
         @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<WebResponse<ContactResponseDto>> post(
+        public ResponseEntity<WebResponseDto<ContactResponseDto>> post(
                         @RequestBody ContactRequestDto request,
                         @AuthenticationPrincipal UserPrincipal principal) {
                 ContactResponseDto contact = contactService.createContact(request, principal.getUserId());
 
                 return ResponseEntity
                                 .status(HttpStatus.CREATED)
-                                .body(WebResponse.<ContactResponseDto>builder()
+                                .body(WebResponseDto.<ContactResponseDto>builder()
                                                 .status(ResponseStatus.SUCCESS)
                                                 .message("Contact added successfully")
                                                 .data(contact)
@@ -53,11 +53,11 @@ public class ContactController {
         }
 
         @PutMapping(path = "/{contactId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-        public WebResponse<ContactResponseDto> put(@RequestBody ContactRequestDto request,
+        public WebResponseDto<ContactResponseDto> put(@RequestBody ContactRequestDto request,
                         @PathVariable Integer contactId, @AuthenticationPrincipal UserPrincipal principal) {
                 ContactResponseDto contact = contactService.updateContact(request, principal.getUserId(), contactId);
 
-                return WebResponse.<ContactResponseDto>builder()
+                return WebResponseDto.<ContactResponseDto>builder()
                                 .status(ResponseStatus.SUCCESS)
                                 .message("Contact updated successfully")
                                 .data(contact)
@@ -65,11 +65,11 @@ public class ContactController {
         }
 
         @GetMapping(path = "/{contactId}", produces = MediaType.APPLICATION_JSON_VALUE)
-        public WebResponse<ContactResponseDto> getOne(@PathVariable Integer contactId,
+        public WebResponseDto<ContactResponseDto> getOne(@PathVariable Integer contactId,
                         @AuthenticationPrincipal UserPrincipal principal) {
                 ContactResponseDto contact = contactService.getContactById(principal.getUserId(), contactId);
 
-                return WebResponse.<ContactResponseDto>builder()
+                return WebResponseDto.<ContactResponseDto>builder()
                                 .status(ResponseStatus.SUCCESS)
                                 .message("Contact retrieved successfully")
                                 .data(contact)
@@ -77,7 +77,7 @@ public class ContactController {
         }
 
         @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-        public WebResponse<List<ContactResponseDto>> search(
+        public WebResponseDto<List<ContactResponseDto>> search(
                         @AuthenticationPrincipal UserPrincipal principal,
                         @RequestParam(required = false) String name,
                         @RequestParam(required = false) String email,
@@ -95,11 +95,11 @@ public class ContactController {
 
                 Page<ContactResponseDto> searchContactResponse = contactService.searchContact(principal.getUserId(),
                                 request);
-                return WebResponse.<List<ContactResponseDto>>builder()
+                return WebResponseDto.<List<ContactResponseDto>>builder()
                                 .status(ResponseStatus.SUCCESS)
                                 .message("Contact retrieved successfully")
                                 .data(searchContactResponse.getContent())
-                                .paging(PagingResponse.builder()
+                                .paging(PagingResponseDto.builder()
                                                 .currentPage(searchContactResponse.getNumber())
                                                 .totalPage(searchContactResponse.getTotalPages())
                                                 .size(searchContactResponse.getSize())

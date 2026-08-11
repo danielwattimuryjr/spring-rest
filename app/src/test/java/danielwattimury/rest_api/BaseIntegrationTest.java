@@ -15,9 +15,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.server.ResponseStatusException;
 
 import danielwattimury.rest_api.constants.ApiConstants;
-import danielwattimury.rest_api.dto.LoginUserRequest;
-import danielwattimury.rest_api.dto.LoginUserResponse;
-import danielwattimury.rest_api.dto.WebResponse;
+import danielwattimury.rest_api.dto.LoginRequestDto;
+import danielwattimury.rest_api.dto.LoginResponseDto;
+import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.RoleEnum;
@@ -69,7 +69,7 @@ public abstract class BaseIntegrationTest {
                 return user;
         }
 
-        protected ResultActions mockLoginRequest(LoginUserRequest request) throws Exception {
+        protected ResultActions mockLoginRequest(LoginRequestDto request) throws Exception {
                 String jsonRequest = objectMapper.writeValueAsString(request);
 
                 return mockMvc.perform(
@@ -80,7 +80,7 @@ public abstract class BaseIntegrationTest {
         }
 
         protected String loginAndGetToken(String username, String password) throws Exception {
-                LoginUserRequest loginRequest = new LoginUserRequest();
+                LoginRequestDto loginRequest = new LoginRequestDto();
                 loginRequest.setUsername(username);
                 loginRequest.setPassword(password);
 
@@ -88,9 +88,9 @@ public abstract class BaseIntegrationTest {
                                 .andExpect(status().isOk())
                                 .andReturn();
 
-                WebResponse<LoginUserResponse> response = objectMapper.readValue(
+                WebResponseDto<LoginResponseDto> response = objectMapper.readValue(
                                 result.getResponse().getContentAsString(),
-                                new TypeReference<WebResponse<LoginUserResponse>>() {
+                                new TypeReference<WebResponseDto<LoginResponseDto>>() {
                                 });
 
                 return response.getData().getToken();

@@ -8,9 +8,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import danielwattimury.rest_api.dto.LoginUserRequest;
-import danielwattimury.rest_api.dto.LoginUserResponse;
-import danielwattimury.rest_api.dto.RegisterUserRequest;
+import danielwattimury.rest_api.dto.LoginRequestDto;
+import danielwattimury.rest_api.dto.LoginResponseDto;
+import danielwattimury.rest_api.dto.RegisterRequestDto;
 import danielwattimury.rest_api.dto.UserResponseDto;
 import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
@@ -47,7 +47,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public LoginUserResponse login(LoginUserRequest request) {
+    public LoginResponseDto login(LoginRequestDto request) {
         validationService.validate(request);
 
         Authentication authentication = authenticationManager.authenticate(
@@ -56,14 +56,14 @@ public class AuthenticationService {
         UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
         JWTToken jwt = jwtService.generateToken(authentication.getName(), principal.getUserId().toString());
 
-        return LoginUserResponse.builder()
+        return LoginResponseDto.builder()
                 .token(jwt.token())
                 .tokenExpiredAt(jwt.expiresAt())
                 .build();
     }
 
     @Transactional
-    public UserResponseDto register(RegisterUserRequest request) {
+    public UserResponseDto register(RegisterRequestDto request) {
         validationService.validate(request);
 
         if (userRepository.existsByUsername(request.getUsername())) {

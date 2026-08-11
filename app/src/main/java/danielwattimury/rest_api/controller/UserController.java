@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import danielwattimury.rest_api.dto.UserResponseDto;
-import danielwattimury.rest_api.dto.PatchCurrentUserRequest;
-import danielwattimury.rest_api.dto.WebResponse;
+import danielwattimury.rest_api.dto.PatchUserDto;
+import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.security.UserPrincipal;
 import danielwattimury.rest_api.service.UserService;
@@ -33,10 +33,10 @@ public class UserController {
     @Operation(summary = "Get current user", description = "Returns information about the currently authenticated user, based on the JWT token")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping(path = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
-    public WebResponse<UserResponseDto> get(@AuthenticationPrincipal UserPrincipal principal) {
+    public WebResponseDto<UserResponseDto> get(@AuthenticationPrincipal UserPrincipal principal) {
         UserResponseDto getCurrentUserResponse = userService.get(principal.getUserId());
 
-        return WebResponse
+        return WebResponseDto
                 .<UserResponseDto>builder()
                 .status(ResponseStatus.SUCCESS)
                 .data(getCurrentUserResponse)
@@ -48,11 +48,11 @@ public class UserController {
             + "omitted fields are left unchanged.")
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping(path = "/current", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public WebResponse<UserResponseDto> patch(@AuthenticationPrincipal UserPrincipal principal,
-            @RequestBody PatchCurrentUserRequest request) {
+    public WebResponseDto<UserResponseDto> patch(@AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody PatchUserDto request) {
         UserResponseDto patchCurrentUserResponse = userService.patch(principal.getUserId(), request);
 
-        return WebResponse
+        return WebResponseDto
                 .<UserResponseDto>builder()
                 .status(ResponseStatus.SUCCESS)
                 .message("User data updated successfully")

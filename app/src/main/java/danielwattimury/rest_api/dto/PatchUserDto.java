@@ -1,6 +1,6 @@
 package danielwattimury.rest_api.dto;
 
-import danielwattimury.rest_api.enums.ResponseStatus;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,14 +10,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WebResponse<T> {
+public class PatchUserDto {
 
-    private ResponseStatus status;
+    @Size(max = 100)
+    private String name;
 
-    private String message;
-
-    private T data;
-
-    private PagingResponse paging;
+    @Size(max = 100)
+    private String password;
 
 }

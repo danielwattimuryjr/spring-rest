@@ -13,11 +13,11 @@ import org.springframework.http.MediaType;
 
 import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
-import danielwattimury.rest_api.dto.LoginUserRequest;
-import danielwattimury.rest_api.dto.LoginUserResponse;
-import danielwattimury.rest_api.dto.RegisterUserRequest;
+import danielwattimury.rest_api.dto.LoginRequestDto;
+import danielwattimury.rest_api.dto.LoginResponseDto;
+import danielwattimury.rest_api.dto.RegisterRequestDto;
 import danielwattimury.rest_api.dto.UserResponseDto;
-import danielwattimury.rest_api.dto.WebResponse;
+import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.enums.ResponseStatus;
 import tools.jackson.core.type.TypeReference;
 
@@ -32,7 +32,7 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
 
         @Test
         void testLoginFailedUserNotFound() throws Exception {
-                LoginUserRequest loginRequest = new LoginUserRequest();
+                LoginRequestDto loginRequest = new LoginRequestDto();
                 loginRequest.setUsername("wrong_user");
                 loginRequest.setPassword("wrong_password");
 
@@ -44,7 +44,7 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
         void testLoginWrongCredentials() throws Exception {
                 registerUser();
 
-                LoginUserRequest loginRequest = new LoginUserRequest();
+                LoginRequestDto loginRequest = new LoginRequestDto();
                 loginRequest.setUsername("john_doe");
                 loginRequest.setPassword("wrong_password");
 
@@ -56,7 +56,7 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
         void testLoginSuccess() throws Exception {
                 registerUser();
 
-                LoginUserRequest loginRequest = new LoginUserRequest();
+                LoginRequestDto loginRequest = new LoginRequestDto();
                 loginRequest.setUsername("john_doe");
                 loginRequest.setPassword("password123");
 
@@ -64,9 +64,9 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                                 .andExpectAll(
                                                 status().isOk())
                                 .andDo(result -> {
-                                        WebResponse<LoginUserResponse> response = objectMapper.readValue(
+                                        WebResponseDto<LoginResponseDto> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponse<LoginUserResponse>>() {
+                                                        new TypeReference<WebResponseDto<LoginResponseDto>>() {
                                                         });
 
                                         assertEquals(ResponseStatus.SUCCESS, response.getStatus());
@@ -81,7 +81,7 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
 
         @Test
         void testRegisterSuccess() throws Exception {
-                RegisterUserRequest registerUserRequest = new RegisterUserRequest();
+                RegisterRequestDto registerUserRequest = new RegisterRequestDto();
                 registerUserRequest.setName("John Doe");
                 registerUserRequest.setUsername("john_doe");
                 registerUserRequest.setPassword("password123");
@@ -96,9 +96,9 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                                 .andExpectAll(
                                                 status().isOk())
                                 .andDo(result -> {
-                                        WebResponse<UserResponseDto> response = objectMapper.readValue(
+                                        WebResponseDto<UserResponseDto> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponse<UserResponseDto>>() {
+                                                        new TypeReference<WebResponseDto<UserResponseDto>>() {
                                                         });
 
                                         assertEquals(ResponseStatus.SUCCESS, response.getStatus());

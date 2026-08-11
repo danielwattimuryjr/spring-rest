@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import danielwattimury.rest_api.dto.WebResponse;
+import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.enums.ResponseStatus;
 
 @Slf4j
@@ -24,7 +24,7 @@ import danielwattimury.rest_api.enums.ResponseStatus;
 public class ErrorController {
 
         @ExceptionHandler(ConstraintViolationException.class)
-        public ResponseEntity<WebResponse<Map<String, String>>> constraintViolationException(
+        public ResponseEntity<WebResponseDto<Map<String, String>>> constraintViolationException(
                         ConstraintViolationException exception) {
                 Map<String, String> errors = new HashMap<>();
 
@@ -36,7 +36,7 @@ public class ErrorController {
 
                 return ResponseEntity
                                 .status(HttpStatus.BAD_REQUEST)
-                                .body(WebResponse
+                                .body(WebResponseDto
                                                 .<Map<String, String>>builder()
                                                 .status(ResponseStatus.ERROR)
                                                 .message("Validation failed")
@@ -45,10 +45,10 @@ public class ErrorController {
         };
 
         @ExceptionHandler(ResponseStatusException.class)
-        public ResponseEntity<WebResponse<String>> apiException(ResponseStatusException exception) {
+        public ResponseEntity<WebResponseDto<String>> apiException(ResponseStatusException exception) {
                 return ResponseEntity
                                 .status(exception.getStatusCode())
-                                .body(WebResponse
+                                .body(WebResponseDto
                                                 .<String>builder()
                                                 .status(ResponseStatus.ERROR)
                                                 .message(exception.getReason())
@@ -56,10 +56,10 @@ public class ErrorController {
         }
 
         @ExceptionHandler(NoHandlerFoundException.class)
-        public ResponseEntity<WebResponse<String>> noHandlerFoundException(NoHandlerFoundException exception) {
+        public ResponseEntity<WebResponseDto<String>> noHandlerFoundException(NoHandlerFoundException exception) {
                 return ResponseEntity
                                 .status(HttpStatus.NOT_FOUND)
-                                .body(WebResponse
+                                .body(WebResponseDto
                                                 .<String>builder()
                                                 .status(ResponseStatus.ERROR)
                                                 .message("Endpoint not found: " + exception.getRequestURL())
@@ -67,32 +67,32 @@ public class ErrorController {
         }
 
         @ExceptionHandler(Exception.class)
-        public ResponseEntity<WebResponse<String>> handleGeneric(Exception ex) {
+        public ResponseEntity<WebResponseDto<String>> handleGeneric(Exception ex) {
                 log.error("Unexpected error occurred", ex);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(WebResponse.<String>builder()
+                                .body(WebResponseDto.<String>builder()
                                                 .status(ResponseStatus.ERROR)
                                                 .message("An unexpected error occurred")
                                                 .build());
         }
 
         @ExceptionHandler(AuthorizationDeniedException.class)
-        public ResponseEntity<WebResponse<String>> authorizationDeniedException(
+        public ResponseEntity<WebResponseDto<String>> authorizationDeniedException(
                         AuthorizationDeniedException exception) {
                 return ResponseEntity
                                 .status(HttpStatus.FORBIDDEN)
-                                .body(WebResponse.<String>builder()
+                                .body(WebResponseDto.<String>builder()
                                                 .status(ResponseStatus.ERROR)
                                                 .message("Access denied: you do not have permission to perform this action")
                                                 .build());
         }
 
         @ExceptionHandler(BadCredentialsException.class)
-        public ResponseEntity<WebResponse<String>> badCredentialsException(
+        public ResponseEntity<WebResponseDto<String>> badCredentialsException(
                         BadCredentialsException exception) {
                 return ResponseEntity
                                 .status(HttpStatus.BAD_REQUEST)
-                                .body(WebResponse.<String>builder()
+                                .body(WebResponseDto.<String>builder()
                                                 .status(ResponseStatus.ERROR)
                                                 .message("Username or password wrong")
                                                 .build());

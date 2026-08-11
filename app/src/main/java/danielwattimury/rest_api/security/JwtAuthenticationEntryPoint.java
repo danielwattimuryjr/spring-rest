@@ -7,7 +7,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import danielwattimury.rest_api.dto.WebResponse;
+import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.enums.ResponseStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,7 +26,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException {
 
-        WebResponse<String> body = WebResponse.<String>builder()
+        WebResponseDto<String> body = WebResponseDto.<String>builder()
                 .status(ResponseStatus.ERROR)
                 .message("Unauthorized: " + authException.getMessage())
                 .build();

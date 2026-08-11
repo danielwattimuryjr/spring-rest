@@ -7,7 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import danielwattimury.rest_api.dto.PatchCurrentUserRequest;
+import danielwattimury.rest_api.dto.PatchUserDto;
 import danielwattimury.rest_api.dto.UserResponseDto;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.repository.UserRepository;
@@ -38,7 +38,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDto patch(Integer userId, PatchCurrentUserRequest request) {
+    public UserResponseDto patch(Integer userId, PatchUserDto request) {
         validationService.validate(request);
 
         User user = getUserOrFail(userId);

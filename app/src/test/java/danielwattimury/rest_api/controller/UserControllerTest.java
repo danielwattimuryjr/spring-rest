@@ -13,10 +13,10 @@ import org.springframework.http.MediaType;
 import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
 import danielwattimury.rest_api.dto.UserResponseDto;
-import danielwattimury.rest_api.dto.LoginUserRequest;
-import danielwattimury.rest_api.dto.LoginUserResponse;
-import danielwattimury.rest_api.dto.PatchCurrentUserRequest;
-import danielwattimury.rest_api.dto.WebResponse;
+import danielwattimury.rest_api.dto.LoginRequestDto;
+import danielwattimury.rest_api.dto.LoginResponseDto;
+import danielwattimury.rest_api.dto.PatchUserDto;
+import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.ResponseStatus;
 import tools.jackson.core.type.TypeReference;
@@ -42,14 +42,14 @@ public class UserControllerTest extends BaseIntegrationTest {
     void getCurrentUser() throws Exception {
         registerUser();
 
-        LoginUserRequest loginRequest = new LoginUserRequest();
+        LoginRequestDto loginRequest = new LoginRequestDto();
         loginRequest.setUsername("john_doe");
         loginRequest.setPassword("password123");
 
         mockLoginRequest(loginRequest).andExpect(status().isOk()).andDo(result -> {
-            WebResponse<LoginUserResponse> response = objectMapper.readValue(
+            WebResponseDto<LoginResponseDto> response = objectMapper.readValue(
                     result.getResponse().getContentAsString(),
-                    new TypeReference<WebResponse<LoginUserResponse>>() {
+                    new TypeReference<WebResponseDto<LoginResponseDto>>() {
                     });
 
             mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/users/current")
@@ -57,9 +57,9 @@ public class UserControllerTest extends BaseIntegrationTest {
                     .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andDo(currentUserResult -> {
-                        WebResponse<UserResponseDto> currentUserResponse = objectMapper.readValue(
+                        WebResponseDto<UserResponseDto> currentUserResponse = objectMapper.readValue(
                                 currentUserResult.getResponse().getContentAsString(),
-                                new TypeReference<WebResponse<UserResponseDto>>() {
+                                new TypeReference<WebResponseDto<UserResponseDto>>() {
                                 });
 
                         assertEquals(loginRequest.getUsername(), currentUserResponse.getData().getUsername());
@@ -71,17 +71,17 @@ public class UserControllerTest extends BaseIntegrationTest {
     void updateCurrentUserSuccess() throws Exception {
         registerUser();
 
-        LoginUserRequest loginRequest = new LoginUserRequest();
+        LoginRequestDto loginRequest = new LoginRequestDto();
         loginRequest.setUsername("john_doe");
         loginRequest.setPassword("password123");
 
         mockLoginRequest(loginRequest).andExpect(status().isOk()).andDo(result -> {
-            WebResponse<LoginUserResponse> response = objectMapper.readValue(
+            WebResponseDto<LoginResponseDto> response = objectMapper.readValue(
                     result.getResponse().getContentAsString(),
-                    new TypeReference<WebResponse<LoginUserResponse>>() {
+                    new TypeReference<WebResponseDto<LoginResponseDto>>() {
                     });
 
-            PatchCurrentUserRequest request = new PatchCurrentUserRequest();
+            PatchUserDto request = new PatchUserDto();
             request.setName("john_doe_updated");
 
             String jsonRequest = objectMapper.writeValueAsString(request);
@@ -93,9 +93,9 @@ public class UserControllerTest extends BaseIntegrationTest {
                     .content(jsonRequest))
                     .andExpect(status().isOk())
                     .andDo(currentUserResult -> {
-                        WebResponse<UserResponseDto> currentUserResponse = objectMapper.readValue(
+                        WebResponseDto<UserResponseDto> currentUserResponse = objectMapper.readValue(
                                 currentUserResult.getResponse().getContentAsString(),
-                                new TypeReference<WebResponse<UserResponseDto>>() {
+                                new TypeReference<WebResponseDto<UserResponseDto>>() {
                                 });
 
                         assertEquals(ResponseStatus.SUCCESS, currentUserResponse.getStatus());
