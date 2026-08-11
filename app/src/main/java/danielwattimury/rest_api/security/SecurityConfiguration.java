@@ -22,7 +22,7 @@ import danielwattimury.rest_api.service.CustomUserDetailsService;
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
-    private CustomUserDetailsService customUserDetailService;
+    private final CustomUserDetailsService customUserDetailService;
 
     private final JwtFilter jwtFilter;
 

@@ -1,6 +1,5 @@
 package danielwattimury.rest_api.model;
 
-import danielwattimury.rest_api.enums.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,14 +9,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WebResponse<T> {
+public class ContactResponseDto {
 
-    private ResponseStatus status;
+    private Integer id;
 
-    private String message;
+    private String firstName;
 
-    private T data;
+    private String lastName;
 
-    private PagingResponse paging;
+    private String phone;
+
+    private String email;
 
 }

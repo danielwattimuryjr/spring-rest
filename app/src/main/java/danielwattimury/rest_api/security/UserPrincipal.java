@@ -11,7 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import danielwattimury.rest_api.entity.User;
 
 public class UserPrincipal implements UserDetails {
-    private User user;
+
+    private final User user;
 
     public UserPrincipal(User user) {
         this.user = user;
@@ -30,6 +31,10 @@ public class UserPrincipal implements UserDetails {
     @Override
     public String getUsername() {
         return user.getUsername();
+    }
+
+    public Integer getUserId() {
+        return user.getId();
     }
 
     @Override

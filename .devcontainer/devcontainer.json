@@ -6,21 +6,20 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "vscjava.vscode-java-pack", // Extension pack utama untuk Java (Debugger, Maven, dll)
-        "vmware.vscode-spring-boot", // Dukungan autocomplete & navigasi Spring Boot
-        "vscjava.vscode-spring-initializr", // Membuat proyek Spring langsung dari VS Code
-        "vscjava.vscode-spring-boot-dashboard", // Panel monitoring aplikasi Spring Boot
-        "vscjava.vscode-lombok", // Jika Anda menggunakan library Lombok
-        "cweijan.vscode-mysql-client2", // Client MySQL: browse table, run query, dsb
-        // "ms-azuretools.vscode-docker", // Mengelola container langsung dari VS Code
-        // "eamodio.gitlens" // Opsional: manajemen Git yang powerful
-        "postman.postman-for-vscode"
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-spring-initializr",
+        "vscjava.vscode-spring-boot-dashboard",
+        "vscjava.vscode-lombok",
+        "cweijan.vscode-mysql-client2",
+        "postman.postman-for-vscode",
+        "icrawl.discord-vscode"
       ]
     }
   },
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/tmp/host-ssh,type=bind,consistency=cached"
   ],
-  "postCreateCommand": "mkdir -p /root/.ssh && cp -r /tmp/host-ssh/. /root/.ssh/ && chown -R root:root /root/.ssh && find /root/.ssh -type f -name 'id_*' ! -name '*.pub' -exec chmod 600 {} \\; && find /root/.ssh -type f -name '*.pub' -exec chmod 644 {} \\; && chmod 600 /root/.ssh/config && chmod 700 /root/.ssh",
+  "postCreateCommand": "mkdir -p /root/.ssh && cp -r /tmp/host-ssh/. /root/.ssh/ && chown -R root:root /root/.ssh && chmod 700 /root/.ssh && chmod 600 /root/.ssh/config /root/.ssh/id_ed25519_personal && chmod 644 /root/.ssh/id_ed25519_personal.pub && git config --local user.name 'Daniel Wattimury' && git config --local user.email 'daniel032902@gmail.com'",
   "remoteUser": "root"
 }

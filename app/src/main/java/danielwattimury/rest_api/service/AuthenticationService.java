@@ -18,6 +18,7 @@ import danielwattimury.rest_api.model.RegisterUserResponse;
 import danielwattimury.rest_api.repository.RoleRepository;
 import danielwattimury.rest_api.repository.UserRepository;
 import danielwattimury.rest_api.security.JwtService;
+import danielwattimury.rest_api.security.UserPrincipal;
 import danielwattimury.rest_api.security.JwtService.JWTToken;
 import jakarta.transaction.Transactional;
 
@@ -52,7 +53,8 @@ public class AuthenticationService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-        JWTToken jwt = jwtService.generateToken(authentication.getName());
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        JWTToken jwt = jwtService.generateToken(authentication.getName(), principal.getUserId().toString());
 
         return LoginUserResponse.builder()
                 .token(jwt.token())

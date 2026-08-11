@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.model.WebResponse;
 
 @Slf4j
@@ -37,7 +38,7 @@ public class ErrorController {
                                 .status(HttpStatus.BAD_REQUEST)
                                 .body(WebResponse
                                                 .<Map<String, String>>builder()
-                                                .status("error")
+                                                .status(ResponseStatus.ERROR)
                                                 .message("Validation failed")
                                                 .data(errors)
                                                 .build());
@@ -49,7 +50,7 @@ public class ErrorController {
                                 .status(exception.getStatusCode())
                                 .body(WebResponse
                                                 .<String>builder()
-                                                .status("error")
+                                                .status(ResponseStatus.ERROR)
                                                 .message(exception.getReason())
                                                 .build());
         }
@@ -60,7 +61,7 @@ public class ErrorController {
                                 .status(HttpStatus.NOT_FOUND)
                                 .body(WebResponse
                                                 .<String>builder()
-                                                .status("error")
+                                                .status(ResponseStatus.ERROR)
                                                 .message("Endpoint not found: " + exception.getRequestURL())
                                                 .build());
         }
@@ -70,7 +71,7 @@ public class ErrorController {
                 log.error("Unexpected error occurred", ex);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(WebResponse.<String>builder()
-                                                .status("error")
+                                                .status(ResponseStatus.ERROR)
                                                 .message("An unexpected error occurred")
                                                 .build());
         }
@@ -81,7 +82,7 @@ public class ErrorController {
                 return ResponseEntity
                                 .status(HttpStatus.FORBIDDEN)
                                 .body(WebResponse.<String>builder()
-                                                .status("error")
+                                                .status(ResponseStatus.ERROR)
                                                 .message("Access denied: you do not have permission to perform this action")
                                                 .build());
         }
@@ -92,7 +93,7 @@ public class ErrorController {
                 return ResponseEntity
                                 .status(HttpStatus.BAD_REQUEST)
                                 .body(WebResponse.<String>builder()
-                                                .status("error")
+                                                .status(ResponseStatus.ERROR)
                                                 .message("Username or password wrong")
                                                 .build());
         }

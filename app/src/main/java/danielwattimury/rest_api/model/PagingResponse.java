@@ -1,6 +1,5 @@
 package danielwattimury.rest_api.model;
 
-import danielwattimury.rest_api.enums.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,14 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WebResponse<T> {
+public class PagingResponse {
 
-    private ResponseStatus status;
+    private Integer currentPage;
 
-    private String message;
+    private Integer totalPage;
 
-    private T data;
-
-    private PagingResponse paging;
+    private Integer size;
 
 }

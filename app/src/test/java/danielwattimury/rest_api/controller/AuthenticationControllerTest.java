@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 
 import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
+import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.model.LoginUserRequest;
 import danielwattimury.rest_api.model.LoginUserResponse;
 import danielwattimury.rest_api.model.RegisterUserRequest;
@@ -68,7 +69,7 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                                                         new TypeReference<WebResponse<LoginUserResponse>>() {
                                                         });
 
-                                        assertEquals("success", response.getStatus());
+                                        assertEquals(ResponseStatus.SUCCESS, response.getStatus());
                                         assertNotNull(response.getData().getToken());
                                         assertNotNull(response.getData().getTokenExpiredAt());
 
@@ -100,7 +101,7 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                                                         new TypeReference<WebResponse<RegisterUserResponse>>() {
                                                         });
 
-                                        assertEquals("success", response.getStatus());
+                                        assertEquals(ResponseStatus.SUCCESS, response.getStatus());
                                         assertEquals("John Doe", response.getData().getName());
                                         assertEquals("john_doe", response.getData().getUsername());
                                 });

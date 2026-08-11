@@ -1,14 +1,16 @@
 package danielwattimury.rest_api.controller;
 
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.model.GetCurrentUserResponse;
 import danielwattimury.rest_api.model.PatchCurrentUserRequest;
 import danielwattimury.rest_api.model.PatchCurrentUserResponse;
 import danielwattimury.rest_api.model.WebResponse;
+import danielwattimury.rest_api.security.UserPrincipal;
 import danielwattimury.rest_api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -32,12 +34,12 @@ public class UserController {
     @Operation(summary = "Get current user", description = "Returns information about the currently authenticated user, based on the JWT token")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping(path = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
-    public WebResponse<GetCurrentUserResponse> get(Authentication authentication) {
-        GetCurrentUserResponse getCurrentUserResponse = userService.get(authentication.getName());
+    public WebResponse<GetCurrentUserResponse> get(@AuthenticationPrincipal UserPrincipal principal) {
+        GetCurrentUserResponse getCurrentUserResponse = userService.get(principal.getUserId());
 
         return WebResponse
                 .<GetCurrentUserResponse>builder()
-                .status("success")
+                .status(ResponseStatus.SUCCESS)
                 .data(getCurrentUserResponse)
                 .build();
     }
@@ -47,13 +49,13 @@ public class UserController {
             + "omitted fields are left unchanged.")
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping(path = "/current", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public WebResponse<PatchCurrentUserResponse> patch(Authentication authentication,
+    public WebResponse<PatchCurrentUserResponse> patch(@AuthenticationPrincipal UserPrincipal principal,
             @RequestBody PatchCurrentUserRequest request) {
-        PatchCurrentUserResponse patchCurrentUserResponse = userService.patch(authentication.getName(), request);
+        PatchCurrentUserResponse patchCurrentUserResponse = userService.patch(principal.getUserId(), request);
 
         return WebResponse
                 .<PatchCurrentUserResponse>builder()
-                .status("success")
+                .status(ResponseStatus.SUCCESS)
                 .message("User data updated successfully")
                 .data(patchCurrentUserResponse)
                 .build();

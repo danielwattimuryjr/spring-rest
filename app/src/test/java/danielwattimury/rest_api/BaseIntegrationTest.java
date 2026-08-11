@@ -1,6 +1,7 @@
 package danielwattimury.rest_api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,9 +19,13 @@ import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.RoleEnum;
 import danielwattimury.rest_api.model.LoginUserRequest;
+import danielwattimury.rest_api.model.LoginUserResponse;
+import danielwattimury.rest_api.model.WebResponse;
+import danielwattimury.rest_api.repository.ContactRepository;
 import danielwattimury.rest_api.repository.RoleRepository;
 import danielwattimury.rest_api.repository.UserRepository;
 import danielwattimury.rest_api.security.JwtService;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -36,14 +42,19 @@ public abstract class BaseIntegrationTest {
     protected UserRepository userRepository;
 
     @Autowired
+    protected ContactRepository contactRepository;
+
+    @Autowired
     protected RoleRepository roleRepository;
 
     @Autowired
     protected JwtService jwtService;
 
+    protected static final String DEFAULT_PASSWORD = "password123";
+
     protected BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-    protected void registerUser() {
+    protected User registerUser() {
         User user = new User();
         Role optionalRole = roleRepository.findByName(RoleEnum.USER)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -51,9 +62,11 @@ public abstract class BaseIntegrationTest {
 
         user.setName("John Doe");
         user.setUsername("john_doe");
-        user.setPassword(encoder.encode("password123"));
+        user.setPassword(encoder.encode(DEFAULT_PASSWORD));
         user.setRole(optionalRole);
         userRepository.save(user);
+
+        return user;
     }
 
     protected ResultActions mockLoginRequest(LoginUserRequest request) throws Exception {
@@ -64,5 +77,22 @@ public abstract class BaseIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest));
+    }
+
+    protected String loginAndGetToken(String username, String password) throws Exception {
+        LoginUserRequest loginRequest = new LoginUserRequest();
+        loginRequest.setUsername(username);
+        loginRequest.setPassword(password);
+
+        MvcResult result = mockLoginRequest(loginRequest)
+                .andExpect(status().isOk())
+                .andReturn();
+
+        WebResponse<LoginUserResponse> response = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                new TypeReference<WebResponse<LoginUserResponse>>() {
+                });
+
+        return response.getData().getToken();
     }
 }
