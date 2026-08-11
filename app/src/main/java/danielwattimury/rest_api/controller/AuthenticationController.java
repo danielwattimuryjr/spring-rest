@@ -3,6 +3,7 @@ package danielwattimury.rest_api.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.model.LoginUserRequest;
 import danielwattimury.rest_api.model.LoginUserResponse;
 import danielwattimury.rest_api.model.RegisterUserRequest;
@@ -36,7 +37,7 @@ public class AuthenticationController {
 
         return WebResponse
                 .<LoginUserResponse>builder()
-                .status("success")
+                .status(ResponseStatus.SUCCESS)
                 .message("Login Successfully")
                 .data(loginResponse)
                 .build();
@@ -50,7 +51,7 @@ public class AuthenticationController {
 
         return WebResponse
                 .<RegisterUserResponse>builder()
-                .status("success")
+                .status(ResponseStatus.SUCCESS)
                 .message("User Created Successfully")
                 .data(registerUserResponse)
                 .build();

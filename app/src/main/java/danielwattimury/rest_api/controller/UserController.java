@@ -5,6 +5,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.model.GetCurrentUserResponse;
 import danielwattimury.rest_api.model.PatchCurrentUserRequest;
 import danielwattimury.rest_api.model.PatchCurrentUserResponse;
@@ -38,7 +39,7 @@ public class UserController {
 
         return WebResponse
                 .<GetCurrentUserResponse>builder()
-                .status("success")
+                .status(ResponseStatus.SUCCESS)
                 .data(getCurrentUserResponse)
                 .build();
     }
@@ -54,7 +55,7 @@ public class UserController {
 
         return WebResponse
                 .<PatchCurrentUserResponse>builder()
-                .status("success")
+                .status(ResponseStatus.SUCCESS)
                 .message("User data updated successfully")
                 .data(patchCurrentUserResponse)
                 .build();

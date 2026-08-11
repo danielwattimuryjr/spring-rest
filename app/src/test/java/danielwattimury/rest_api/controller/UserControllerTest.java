@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
 import danielwattimury.rest_api.entity.User;
+import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.model.GetCurrentUserResponse;
 import danielwattimury.rest_api.model.LoginUserRequest;
 import danielwattimury.rest_api.model.LoginUserResponse;
@@ -98,7 +99,7 @@ public class UserControllerTest extends BaseIntegrationTest {
                                 new TypeReference<WebResponse<PatchCurrentUserResponse>>() {
                                 });
 
-                        assertEquals("success", currentUserResponse.getStatus());
+                        assertEquals(ResponseStatus.SUCCESS, currentUserResponse.getStatus());
                         assertEquals(loginRequest.getUsername(), currentUserResponse.getData().getUsername());
                         assertEquals("john_doe_updated", currentUserResponse.getData().getName());
                     });
