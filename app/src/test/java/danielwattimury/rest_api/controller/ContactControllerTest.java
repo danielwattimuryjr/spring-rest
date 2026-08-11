@@ -31,6 +31,7 @@ import tools.jackson.core.type.TypeReference;
 public class ContactControllerTest extends BaseIntegrationTest {
 
         private User sampleUser;
+
         private String token;
 
         @BeforeEach
@@ -57,6 +58,9 @@ public class ContactControllerTest extends BaseIntegrationTest {
          * 1. Last Name
          * 2. Phone
          * 3. Malformed Email
+         * 
+         * Should: Error
+         * Reason: Email/First Name is null
          */
         @Test
         void testPostValidationError() throws Exception {
