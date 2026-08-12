@@ -81,7 +81,6 @@ public class AddressService {
     }
 
     public AddressResponseDto getAddressById(Integer contactId, Integer addressId, Integer userId) {
-
         Contact contact = contactRepository.findByIdAndUserId(contactId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Contact not found"));
@@ -91,6 +90,17 @@ public class AddressService {
 
         return toAddressResponse(address);
 
+    }
+
+    public void deleteAddressById(Integer contactId, Integer addressId, Integer userId) {
+        Contact contact = contactRepository.findByIdAndUserId(contactId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Contact not found"));
+        Address address = addressRepository.findFirstByContactAndId(contact, addressId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Address not found"));
+
+        addressRepository.delete(address);
     }
 
 }

@@ -1,7 +1,9 @@
 package danielwattimury.rest_api.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -191,6 +193,18 @@ public class AddressControllerTest extends BaseIntegrationTest {
                     assertEquals("Bali", data.getProvince());
                     assertEquals("Jl. Sunset Road", data.getStreet());
                 });
+    }
+
+    @Test
+    void testDeleteSuccess() throws Exception {
+        Address savedAddress = createAddress(sampleContact);
+
+        mockMvc.perform(delete(ApiConstants.API_BASE_PATH + "/contacts/{contactId}/addresses/{addressId}",
+                sampleContact.getId(), savedAddress.getId())
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+
+        assertFalse(addressRepository.existsById(savedAddress.getId()));
     }
 
 }
