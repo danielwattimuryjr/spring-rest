@@ -35,6 +35,7 @@ public class AddressService {
                 .city(address.getCity())
                 .province(address.getProvince())
                 .country(address.getCountry())
+                .postalCode(address.getPostalCode())
                 .build();
     }
 
@@ -77,6 +78,19 @@ public class AddressService {
         addressRepository.save(address);
 
         return toAddressResponse(address);
+    }
+
+    public AddressResponseDto getAddressById(Integer contactId, Integer addressId, Integer userId) {
+
+        Contact contact = contactRepository.findByIdAndUserId(contactId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Contact not found"));
+        Address address = addressRepository.findFirstByContactAndId(contact, addressId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Address not found"));
+
+        return toAddressResponse(address);
+
     }
 
 }

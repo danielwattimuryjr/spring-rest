@@ -2,6 +2,7 @@ package danielwattimury.rest_api.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,6 +17,7 @@ import org.springframework.http.MediaType;
 import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
 import danielwattimury.rest_api.dto.AddressRequestDto;
+import danielwattimury.rest_api.dto.AddressResponseDto;
 import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.entity.Address;
 import danielwattimury.rest_api.entity.Contact;
@@ -31,13 +33,13 @@ public class AddressControllerTest extends BaseIntegrationTest {
 
     private String token;
 
-    private Contact createContact(String firstName, String lastName, String email, String phone) {
+    private Contact createContact(String firstName, String lastName, String email, String phone, User user) {
         Contact contact = new Contact();
         contact.setFirstName(firstName);
         contact.setLastName(lastName);
         contact.setEmail(email);
         contact.setPhone(phone);
-        contact.setUser(sampleUser);
+        contact.setUser(user);
         return contactRepository.save(contact);
     }
 
@@ -60,8 +62,8 @@ public class AddressControllerTest extends BaseIntegrationTest {
         userRepository.deleteAll();
 
         sampleUser = registerUser();
+        sampleContact = createContact("Jane", "Doe", "jane@example.com", "081111111111", sampleUser);
         token = loginAndGetToken(sampleUser.getUsername(), DEFAULT_PASSWORD);
-        sampleContact = createContact("Jane", "Doe", "jane@example.com", "081111111111");
     }
 
     /*
@@ -160,6 +162,35 @@ public class AddressControllerTest extends BaseIntegrationTest {
         assertEquals(
                 sampleContact.getId(),
                 updatedAddress.getContact().getId());
+    }
+
+    @Test
+    void testGetOneSuccess() throws Exception {
+        Address savedAddress = createAddress(sampleContact);
+
+        mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/contacts/{contactId}/addresses/{addressId}",
+                sampleContact.getId(), savedAddress.getId())
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andDo(result -> {
+                    WebResponseDto<AddressResponseDto> response = objectMapper.readValue(
+                            result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponseDto<AddressResponseDto>>() {
+                            });
+
+                    assertEquals(ResponseStatus.SUCCESS, response.getStatus());
+                    assertEquals(
+                            "Address retrieved successfully",
+                            response.getMessage());
+
+                    AddressResponseDto data = response.getData();
+
+                    assertEquals("Denpasar", data.getCity());
+                    assertEquals("Indonesia", data.getCountry());
+                    assertEquals("80225", data.getPostalCode());
+                    assertEquals("Bali", data.getProvince());
+                    assertEquals("Jl. Sunset Road", data.getStreet());
+                });
     }
 
 }
