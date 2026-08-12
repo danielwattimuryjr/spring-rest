@@ -1,5 +1,8 @@
 package danielwattimury.rest_api.controller;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +14,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import danielwattimury.rest_api.dto.AddressRequestDto;
 import danielwattimury.rest_api.dto.AddressResponseDto;
+import danielwattimury.rest_api.dto.PagingRequestDto;
+import danielwattimury.rest_api.dto.PagingResponseDto;
 import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.security.UserPrincipal;
@@ -89,6 +95,32 @@ public class AddressController {
         addressService.deleteAddressById(contactId, addressId, principal.getUserId());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public WebResponseDto<List<AddressResponseDto>> getAll(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Integer contactId,
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size) {
+
+        PagingRequestDto paginationRequest = PagingRequestDto.builder()
+                .size(size)
+                .page(page)
+                .build();
+
+        Page<AddressResponseDto> getAllAddressResult = addressService.getAllAddresses(principal.getUserId(), contactId,
+                paginationRequest);
+        return WebResponseDto.<List<AddressResponseDto>>builder()
+                .status(ResponseStatus.SUCCESS)
+                .message("Addresses retrieved successfully")
+                .data(getAllAddressResult.getContent())
+                .paging(PagingResponseDto.builder()
+                        .currentPage(getAllAddressResult.getNumber())
+                        .totalPage(getAllAddressResult.getTotalPages())
+                        .size(getAllAddressResult.getSize())
+                        .build())
+                .build();
     }
 
 }

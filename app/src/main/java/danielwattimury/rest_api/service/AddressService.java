@@ -1,11 +1,18 @@
 package danielwattimury.rest_api.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import danielwattimury.rest_api.dto.AddressRequestDto;
 import danielwattimury.rest_api.dto.AddressResponseDto;
+import danielwattimury.rest_api.dto.PagingRequestDto;
 import danielwattimury.rest_api.entity.Address;
 import danielwattimury.rest_api.entity.Contact;
 import danielwattimury.rest_api.repository.AddressRepository;
@@ -101,6 +108,20 @@ public class AddressService {
                         "Address not found"));
 
         addressRepository.delete(address);
+    }
+
+    public Page<AddressResponseDto> getAllAddresses(Integer userId, Integer contactId, PagingRequestDto pagination) {
+        Contact contact = contactRepository.findByIdAndUserId(contactId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Contact not found"));
+
+        Pageable pageable = PageRequest.of(pagination.getPage(), pagination.getSize());
+        Page<Address> addresses = addressRepository.findAllByContact(contact, pageable);
+        List<AddressResponseDto> addressResponse = addresses.getContent().stream()
+                .map(this::toAddressResponse)
+                .toList();
+
+        return new PageImpl<>(addressResponse, pageable, addresses.getTotalElements());
     }
 
 }

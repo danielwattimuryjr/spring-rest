@@ -2,6 +2,7 @@ package danielwattimury.rest_api.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -23,8 +24,10 @@ import danielwattimury.rest_api.dto.AddressResponseDto;
 import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.entity.Address;
 import danielwattimury.rest_api.entity.Contact;
+import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.ResponseStatus;
+import danielwattimury.rest_api.enums.RoleEnum;
 import tools.jackson.core.type.TypeReference;
 
 public class AddressControllerTest extends BaseIntegrationTest {
@@ -205,6 +208,152 @@ public class AddressControllerTest extends BaseIntegrationTest {
                 .andExpect(status().isNoContent());
 
         assertFalse(addressRepository.existsById(savedAddress.getId()));
+    }
+
+    @Test
+    void getAllAddressesSuccess() throws Exception {
+        createAddress(sampleContact);
+        createAddress(sampleContact);
+
+        mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/contacts/" + sampleContact.getId() + "/addresses")
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(result -> {
+                    WebResponseDto<List<AddressResponseDto>> response = objectMapper.readValue(
+                            result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponseDto<List<AddressResponseDto>>>() {
+                            });
+
+                    assertEquals(ResponseStatus.SUCCESS, response.getStatus());
+                    assertEquals(2, response.getData().size());
+                });
+    }
+
+    @Test
+    void getAllAddressesReturnsEmptyListWhenNoAddresses() throws Exception {
+        mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/contacts/" + sampleContact.getId() + "/addresses")
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(result -> {
+                    WebResponseDto<List<AddressResponseDto>> response = objectMapper.readValue(
+                            result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponseDto<List<AddressResponseDto>>>() {
+                            });
+
+                    assertEquals(ResponseStatus.SUCCESS, response.getStatus());
+                    assertTrue(response.getData().isEmpty());
+                });
+    }
+
+    @Test
+    void getAllAddressesPagingMetadataIsCorrect() throws Exception {
+        for (int i = 0; i < 15; i++) {
+            createAddress(sampleContact);
+        }
+
+        mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/contacts/" + sampleContact.getId() + "/addresses")
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON)
+                .param("page", "0")
+                .param("size", "10"))
+                .andExpect(status().isOk())
+                .andDo(result -> {
+                    WebResponseDto<List<AddressResponseDto>> response = objectMapper.readValue(
+                            result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponseDto<List<AddressResponseDto>>>() {
+                            });
+
+                    assertEquals(10, response.getData().size());
+                    assertNotNull(response.getPaging());
+                    assertEquals(0, response.getPaging().getCurrentPage());
+                    assertEquals(2, response.getPaging().getTotalPage()); // 15 items / size 10 -> 2 pages
+                    assertEquals(10, response.getPaging().getSize());
+                });
+    }
+
+    @Test
+    void getAllAddressesSecondPage() throws Exception {
+        for (int i = 0; i < 15; i++) {
+            createAddress(sampleContact);
+        }
+
+        mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/contacts/" + sampleContact.getId() + "/addresses")
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON)
+                .param("page", "1")
+                .param("size", "10"))
+                .andExpect(status().isOk())
+                .andDo(result -> {
+                    WebResponseDto<List<AddressResponseDto>> response = objectMapper.readValue(
+                            result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponseDto<List<AddressResponseDto>>>() {
+                            });
+
+                    assertEquals(5, response.getData().size()); // remaining 5 of 15
+                    assertEquals(1, response.getPaging().getCurrentPage());
+                });
+    }
+
+    @Test
+    void getAllAddressesUsesDefaultPagingWhenParamsOmitted() throws Exception {
+        for (int i = 0; i < 3; i++) {
+            createAddress(sampleContact);
+        }
+
+        mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/contacts/" + sampleContact.getId() + "/addresses")
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(result -> {
+                    WebResponseDto<List<AddressResponseDto>> response = objectMapper.readValue(
+                            result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponseDto<List<AddressResponseDto>>>() {
+                            });
+
+                    assertEquals(3, response.getData().size());
+                    assertEquals(0, response.getPaging().getCurrentPage()); // default page = 0
+                    assertEquals(10, response.getPaging().getSize()); // default size = 10
+                });
+    }
+
+    @Test
+    void getAllAddressesContactNotFound() throws Exception {
+        Integer nonExistentContactId = 99999;
+
+        mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/contacts/" + nonExistentContactId + "/addresses")
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andDo(result -> {
+                    WebResponseDto<String> response = objectMapper.readValue(
+                            result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponseDto<String>>() {
+                            });
+
+                    assertEquals(ResponseStatus.ERROR, response.getStatus());
+                });
+    }
+
+    @Test
+    void getAllAddressesForAnotherUsersContactReturnsNotFound() throws Exception {
+        Role role = roleRepository.findByName(RoleEnum.USER).orElseThrow();
+        User otherUser = new User();
+        otherUser.setUsername("other_user");
+        otherUser.setName("Other User");
+        otherUser.setPassword(encoder.encode(DEFAULT_PASSWORD));
+        otherUser.setRole(role);
+        userRepository.save(otherUser);
+
+        Contact otherContact = createContact("Someone", "Else", "someone@example.com", "089999999999", otherUser);
+        createAddress(otherContact);
+
+        // sampleUser's token trying to list addresses on otherUser's contact
+        mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/contacts/" + otherContact.getId() + "/addresses")
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
 }
