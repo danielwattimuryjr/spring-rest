@@ -21,6 +21,7 @@ import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.RoleEnum;
+import danielwattimury.rest_api.repository.AddressRepository;
 import danielwattimury.rest_api.repository.ContactRepository;
 import danielwattimury.rest_api.repository.RoleRepository;
 import danielwattimury.rest_api.repository.UserRepository;
@@ -43,6 +44,9 @@ public abstract class BaseIntegrationTest {
 
         @Autowired
         protected ContactRepository contactRepository;
+
+        @Autowired
+        protected AddressRepository addressRepository;
 
         @Autowired
         protected RoleRepository roleRepository;
