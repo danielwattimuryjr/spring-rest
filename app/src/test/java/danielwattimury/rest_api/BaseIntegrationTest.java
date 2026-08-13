@@ -23,6 +23,7 @@ import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.RoleEnum;
 import danielwattimury.rest_api.repository.AddressRepository;
 import danielwattimury.rest_api.repository.ContactRepository;
+import danielwattimury.rest_api.repository.RefreshTokenRepository;
 import danielwattimury.rest_api.repository.RoleRepository;
 import danielwattimury.rest_api.repository.UserRepository;
 import danielwattimury.rest_api.security.JwtService;
@@ -44,6 +45,9 @@ public abstract class BaseIntegrationTest {
 
         @Autowired
         protected ContactRepository contactRepository;
+
+        @Autowired
+        protected RefreshTokenRepository refreshTokenRepository;
 
         @Autowired
         protected AddressRepository addressRepository;
@@ -83,12 +87,15 @@ public abstract class BaseIntegrationTest {
                                                 .content(jsonRequest));
         }
 
-        protected String loginAndGetToken(String username, String password) throws Exception {
-                LoginRequestDto loginRequest = new LoginRequestDto();
-                loginRequest.setUsername(username);
-                loginRequest.setPassword(password);
+        protected LoginResponseDto login(String username, String password) throws Exception {
+                LoginRequestDto request = new LoginRequestDto();
+                request.setUsername(username);
+                request.setPassword(password);
 
-                MvcResult result = mockLoginRequest(loginRequest)
+                MvcResult result = mockMvc.perform(post(ApiConstants.API_BASE_PATH + "/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk())
                                 .andReturn();
 
@@ -97,6 +104,6 @@ public abstract class BaseIntegrationTest {
                                 new TypeReference<WebResponseDto<LoginResponseDto>>() {
                                 });
 
-                return response.getData().getToken();
+                return response.getData();
         }
 }

@@ -6,6 +6,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 import javax.crypto.KeyGenerator;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -36,23 +38,24 @@ public class JwtService {
         }
     }
 
-    public record JWTToken(
+    public record JwtToken(
             String token,
             Instant expiresAt) {
     }
 
-    public JWTToken generateToken(String username, String userId) {
+    public JwtToken generateToken(String username, String userId) {
         Instant expiration = Instant.now().plus(30, ChronoUnit.MINUTES);
         return generateToken(username, userId, expiration);
     }
 
-    public JWTToken generateToken(String username, String userId, Instant expiration) {
+    public JwtToken generateToken(String username, String userId, Instant expiration) {
         Instant now = Instant.now();
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("username", username);
 
         String token = Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .claims()
                 .add(claims)
                 .subject(userId)
@@ -62,7 +65,7 @@ public class JwtService {
                 .signWith(getKey())
                 .compact();
 
-        return new JWTToken(token, expiration);
+        return new JwtToken(token, expiration);
     }
 
     private SecretKey getKey() {
@@ -90,6 +93,15 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            extractAllClaims(token);
+            return !isTokenExpired(token);
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
