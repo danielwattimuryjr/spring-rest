@@ -68,7 +68,7 @@ public class AddressControllerTest extends BaseIntegrationTest {
 
         sampleUser = registerUser();
         sampleContact = createContact("Jane", "Doe", "jane@example.com", "081111111111", sampleUser);
-        token = loginAndGetToken(sampleUser.getUsername(), DEFAULT_PASSWORD);
+        token = login(sampleUser.getUsername(), DEFAULT_PASSWORD).getAccessToken();
     }
 
     /*

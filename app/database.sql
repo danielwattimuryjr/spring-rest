@@ -14,7 +14,7 @@ CREATE TABLE contacts (
     phone VARCHAR(100),
     email VARCHAR(100),
     user_id INTEGER NOT NULL,
-    FOREIGN KEY fk_users_contacts (user_id) REFERENCES users (id)
+    FOREIGN KEY fk_users_contacts (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE InnoDB;
 
 CREATE TABLE addresses (
@@ -25,7 +25,7 @@ CREATE TABLE addresses (
     province VARCHAR(100),
     country VARCHAR(100) NOT NULL,
     postal_code VARCHAR(10),
-    FOREIGN KEY fk_contacts_addresses (contact_id) REFERENCES contacts (id)
+    FOREIGN KEY fk_contacts_addresses (contact_id) REFERENCES contacts (id) ON DELETE CASCADE
 ) ENGINE InnoDB;
 
 CREATE TABLE roles (
@@ -51,7 +51,7 @@ VALUES (
 ALTER TABLE users ADD COLUMN role_id INT NOT NULL;
 
 ALTER TABLE users
-ADD CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles (id);
+ADD CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE;
 
 CREATE TABLE refresh_tokens (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -60,5 +60,5 @@ CREATE TABLE refresh_tokens (
     expires_at TIMESTAMP NOT NULL,
     revoked BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY fk_users_refresh_tokens (user_id) REFERENCES users (id)
+    FOREIGN KEY fk_users_refresh_tokens (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE InnoDB;

@@ -40,7 +40,7 @@ public class ContactControllerTest extends BaseIntegrationTest {
                 userRepository.deleteAll();
 
                 sampleUser = registerUser();
-                token = loginAndGetToken(sampleUser.getUsername(), DEFAULT_PASSWORD);
+                token = login(sampleUser.getUsername(), DEFAULT_PASSWORD).getAccessToken();
         }
 
         private Contact createContact(String firstName, String lastName, String email, String phone) {
