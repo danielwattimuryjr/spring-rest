@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Tag(name = "Authentication", description = "Endpoints for user registration and login")
 @RestController
@@ -57,4 +58,29 @@ public class AuthenticationController {
                 .build();
     }
 
+    @PostMapping(path = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
+    public WebResponseDto<LoginResponseDto> refresh(@RequestHeader("Authorization") String authorizationHeader) {
+        String refreshToken = authorizationHeader.substring(7);
+
+        LoginResponseDto refreshResponse = authenticationService.refreshToken(refreshToken);
+
+        return WebResponseDto
+                .<LoginResponseDto>builder()
+                .status(ResponseStatus.SUCCESS)
+                .data(refreshResponse)
+                .build();
+    }
+
+    @PostMapping(path = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
+    public WebResponseDto<LoginResponseDto> logout(@RequestHeader("Authorization") String authorizationHeader) {
+        String refreshToken = authorizationHeader.substring(7);
+
+        authenticationService.logout(refreshToken);
+
+        return WebResponseDto
+                .<LoginResponseDto>builder()
+                .status(ResponseStatus.SUCCESS)
+                .message("User has been log out successfully")
+                .build();
+    }
 }

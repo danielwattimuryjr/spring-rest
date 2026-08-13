@@ -55,6 +55,20 @@ public class AuthenticationService {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
+    private record TokenPair(
+            JwtToken accessToken,
+            JwtToken refreshToken) {
+    }
+
+    private TokenPair generateTokens(String username, Integer userId) {
+        JwtToken accessToken = jwtService.generateToken(username, userId.toString());
+
+        Instant refreshTokenExpiration = Instant.now().plus(7, ChronoUnit.DAYS);
+        JwtToken refreshToken = jwtService.generateToken(username, userId.toString(), refreshTokenExpiration);
+
+        return new TokenPair(accessToken, refreshToken);
+    }
+
     @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
         validationService.validate(request);
@@ -63,27 +77,60 @@ public class AuthenticationService {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
-        JwtToken accessToken = jwtService.generateToken(authentication.getName(), principal.getUserId().toString());
 
-        Instant refreshTokenExpiration = Instant.now().plus(7, ChronoUnit.DAYS);
-        JwtToken refreshToken = jwtService.generateToken(authentication.getName(), principal.getUserId().toString(),
-                refreshTokenExpiration);
+        TokenPair tokens = generateTokens(authentication.getName(), principal.getUserId());
 
         User userEntity = userRepository.findById(principal.getUserId()).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "User not found"));
 
         RefreshToken refreshTokenEntity = new RefreshToken();
-        refreshTokenEntity.setToken(refreshToken.token());
-        refreshTokenEntity.setExpiresAt(refreshToken.expiresAt());
+        refreshTokenEntity.setToken(tokens.refreshToken.token());
+        refreshTokenEntity.setExpiresAt(tokens.refreshToken.expiresAt());
         refreshTokenEntity.setUser(userEntity);
         refreshTokenEntity.setRevoked(false);
         refreshTokenRepository.save(refreshTokenEntity);
 
         return LoginResponseDto.builder()
-                .accessToken(accessToken.token())
-                .refreshToken(refreshToken.token())
-                .refreshTokenExpiresAt(refreshToken.expiresAt())
+                .accessToken(tokens.accessToken.token())
+                .refreshToken(tokens.refreshToken.token())
+                .refreshTokenExpiresAt(tokens.refreshToken.expiresAt())
+                .build();
+    }
+
+    @Transactional
+    public LoginResponseDto refreshToken(String refreshToken) {
+        RefreshToken existingRefreshToken = refreshTokenRepository.findFirstByToken(refreshToken)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User not found"));
+
+        if (existingRefreshToken.isRevoked() || existingRefreshToken.getExpiresAt().isBefore(Instant.now())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is invalid or expired");
+        }
+
+        boolean isTokenValid = jwtService.validateToken(refreshToken);
+        if (!isTokenValid) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is invalid or expired");
+        }
+
+        existingRefreshToken.setRevoked(true);
+        refreshTokenRepository.save(existingRefreshToken);
+
+        User user = existingRefreshToken.getUser();
+        TokenPair newTokens = generateTokens(user.getUsername(), user.getId());
+
+        RefreshToken newRefreshTokenEntity = new RefreshToken();
+        newRefreshTokenEntity.setToken(newTokens.refreshToken.token());
+        newRefreshTokenEntity.setExpiresAt(newTokens.refreshToken.expiresAt());
+        newRefreshTokenEntity.setUser(user);
+        newRefreshTokenEntity.setRevoked(false);
+        refreshTokenRepository.save(newRefreshTokenEntity);
+
+        return LoginResponseDto.builder()
+                .accessToken(newTokens.accessToken.token())
+                .refreshToken(newTokens.refreshToken.token())
+                .refreshTokenExpiresAt(newTokens.refreshToken.expiresAt())
                 .build();
     }
 
@@ -111,5 +158,25 @@ public class AuthenticationService {
                 .name(user.getName())
                 .username(user.getUsername())
                 .build();
+    }
+
+    @Transactional
+    public void logout(String refreshToken) {
+        RefreshToken existingRefreshToken = refreshTokenRepository.findFirstByToken(refreshToken)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User not found"));
+
+        if (existingRefreshToken.isRevoked() || existingRefreshToken.getExpiresAt().isBefore(Instant.now())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is invalid or expired");
+        }
+
+        boolean isTokenValid = jwtService.validateToken(refreshToken);
+        if (!isTokenValid) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is invalid or expired");
+        }
+
+        existingRefreshToken.setRevoked(true);
+        refreshTokenRepository.save(existingRefreshToken);
     }
 }
