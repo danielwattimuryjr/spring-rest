@@ -7,8 +7,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import danielwattimury.rest_api.dto.WebResponseDto;
-import danielwattimury.rest_api.enums.ResponseStatus;
+import danielwattimury.rest_api.responses.Response;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import tools.jackson.databind.ObjectMapper;
@@ -26,10 +25,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException {
 
-        WebResponseDto<String> body = WebResponseDto.<String>builder()
-                .status(ResponseStatus.ERROR)
-                .message("Unauthorized: " + authException.getMessage())
-                .build();
+        Response<Void> body = Response.failedResponse("Forbidden: " + authException.getMessage());
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

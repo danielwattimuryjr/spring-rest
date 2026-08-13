@@ -20,9 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import danielwattimury.rest_api.dto.ContactRequestDto;
 import danielwattimury.rest_api.dto.ContactResponseDto;
 import danielwattimury.rest_api.dto.ContactSearchDto;
-import danielwattimury.rest_api.dto.PagingResponseDto;
-import danielwattimury.rest_api.dto.WebResponseDto;
-import danielwattimury.rest_api.enums.ResponseStatus;
+import danielwattimury.rest_api.responses.Pagination;
+import danielwattimury.rest_api.responses.Response;
 import danielwattimury.rest_api.security.UserPrincipal;
 import danielwattimury.rest_api.service.ContactService;
 
@@ -37,47 +36,34 @@ public class ContactController {
         }
 
         @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<WebResponseDto<ContactResponseDto>> post(
+        public ResponseEntity<Response<ContactResponseDto>> post(
                         @RequestBody ContactRequestDto request,
                         @AuthenticationPrincipal UserPrincipal principal) {
                 ContactResponseDto contact = contactService.createContact(request, principal.getUserId());
+                Response<ContactResponseDto> successfulResponse = Response
+                                .successfulResponse(HttpStatus.CREATED, "Contact added successfully", contact);
 
-                return ResponseEntity
-                                .status(HttpStatus.CREATED)
-                                .body(WebResponseDto.<ContactResponseDto>builder()
-                                                .status(ResponseStatus.SUCCESS)
-                                                .message("Contact added successfully")
-                                                .data(contact)
-                                                .build());
-
+                return ResponseEntity.status(HttpStatus.CREATED).body(successfulResponse);
         }
 
         @PutMapping(path = "/{contactId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-        public WebResponseDto<ContactResponseDto> put(@RequestBody ContactRequestDto request,
+        public Response<ContactResponseDto> put(@RequestBody ContactRequestDto request,
                         @PathVariable Integer contactId, @AuthenticationPrincipal UserPrincipal principal) {
                 ContactResponseDto contact = contactService.updateContact(request, principal.getUserId(), contactId);
 
-                return WebResponseDto.<ContactResponseDto>builder()
-                                .status(ResponseStatus.SUCCESS)
-                                .message("Contact updated successfully")
-                                .data(contact)
-                                .build();
+                return Response.successfulResponse("Contact updated successfully", contact);
         }
 
         @GetMapping(path = "/{contactId}", produces = MediaType.APPLICATION_JSON_VALUE)
-        public WebResponseDto<ContactResponseDto> getOne(@PathVariable Integer contactId,
+        public Response<ContactResponseDto> getOne(@PathVariable Integer contactId,
                         @AuthenticationPrincipal UserPrincipal principal) {
                 ContactResponseDto contact = contactService.getContactById(principal.getUserId(), contactId);
 
-                return WebResponseDto.<ContactResponseDto>builder()
-                                .status(ResponseStatus.SUCCESS)
-                                .message("Contact retrieved successfully")
-                                .data(contact)
-                                .build();
+                return Response.successfulResponse("Contact retrieved successfully", contact);
         }
 
         @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-        public WebResponseDto<List<ContactResponseDto>> search(
+        public Response<List<ContactResponseDto>> search(
                         @AuthenticationPrincipal UserPrincipal principal,
                         @RequestParam(required = false) String name,
                         @RequestParam(required = false) String email,
@@ -95,25 +81,25 @@ public class ContactController {
 
                 Page<ContactResponseDto> searchContactResponse = contactService.searchContact(principal.getUserId(),
                                 request);
-                return WebResponseDto.<List<ContactResponseDto>>builder()
-                                .status(ResponseStatus.SUCCESS)
-                                .message("Contact retrieved successfully")
-                                .data(searchContactResponse.getContent())
-                                .paging(PagingResponseDto.builder()
-                                                .currentPage(searchContactResponse.getNumber())
-                                                .totalPage(searchContactResponse.getTotalPages())
-                                                .size(searchContactResponse.getSize())
-                                                .build())
+
+                Pagination pagination = Pagination.builder()
+                                .page(searchContactResponse.getNumber())
+                                .size(searchContactResponse.getSize())
+                                .totalElements(searchContactResponse.getTotalElements())
+                                .totalPages(searchContactResponse.getTotalPages())
                                 .build();
+
+                return Response.successfulResponse("Contact retrieved successfully", searchContactResponse.getContent(),
+                                pagination);
         }
 
         @DeleteMapping(path = "/{contactId}")
-        public ResponseEntity<Void> delete(
+        public Response<Void> delete(
                         @PathVariable Integer contactId,
                         @AuthenticationPrincipal UserPrincipal principal) {
                 contactService.deleteContactById(principal.getUserId(), contactId);
 
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                return Response.successfulResponse("User deleted successfully");
         }
 
 }

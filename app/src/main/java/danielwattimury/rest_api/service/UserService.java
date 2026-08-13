@@ -2,14 +2,13 @@ package danielwattimury.rest_api.service;
 
 import java.util.Objects;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import danielwattimury.rest_api.dto.PatchUserDto;
 import danielwattimury.rest_api.dto.UserResponseDto;
 import danielwattimury.rest_api.entity.User;
+import danielwattimury.rest_api.exceptions.ResourceNotFoundException;
 import danielwattimury.rest_api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
@@ -29,7 +28,7 @@ public class UserService {
 
     public UserResponseDto get(Integer userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return UserResponseDto.builder()
                 .name(user.getName())
@@ -62,7 +61,7 @@ public class UserService {
 
     public User getUserOrFail(Integer userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
 }

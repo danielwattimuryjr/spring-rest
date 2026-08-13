@@ -15,19 +15,19 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
 import danielwattimury.rest_api.dto.AddressRequestDto;
 import danielwattimury.rest_api.dto.AddressResponseDto;
-import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.entity.Address;
 import danielwattimury.rest_api.entity.Contact;
 import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
-import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.enums.RoleEnum;
+import danielwattimury.rest_api.responses.Response;
 import tools.jackson.core.type.TypeReference;
 
 public class AddressControllerTest extends BaseIntegrationTest {
@@ -97,12 +97,12 @@ public class AddressControllerTest extends BaseIntegrationTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andDo(result -> {
-                    WebResponseDto<Map<String, String>> response = objectMapper.readValue(
+                    Response<Map<String, String>> response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<WebResponseDto<Map<String, String>>>() {
+                            new TypeReference<Response<Map<String, String>>>() {
                             });
 
-                    assertEquals(ResponseStatus.ERROR, response.getStatus());
+                    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
                     assertTrue(response.getData().containsKey("country"));
                 });
     }
@@ -178,12 +178,12 @@ public class AddressControllerTest extends BaseIntegrationTest {
                 .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andDo(result -> {
-                    WebResponseDto<AddressResponseDto> response = objectMapper.readValue(
+                    Response<AddressResponseDto> response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<WebResponseDto<AddressResponseDto>>() {
+                            new TypeReference<Response<AddressResponseDto>>() {
                             });
 
-                    assertEquals(ResponseStatus.SUCCESS, response.getStatus());
+                    assertEquals(HttpStatus.OK, response.getStatusCode());
                     assertEquals(
                             "Address retrieved successfully",
                             response.getMessage());
@@ -205,7 +205,7 @@ public class AddressControllerTest extends BaseIntegrationTest {
         mockMvc.perform(delete(ApiConstants.API_BASE_PATH + "/contacts/{contactId}/addresses/{addressId}",
                 sampleContact.getId(), savedAddress.getId())
                 .header("Authorization", "Bearer " + token))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
 
         assertFalse(addressRepository.existsById(savedAddress.getId()));
     }
@@ -220,12 +220,12 @@ public class AddressControllerTest extends BaseIntegrationTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(result -> {
-                    WebResponseDto<List<AddressResponseDto>> response = objectMapper.readValue(
+                    Response<List<AddressResponseDto>> response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<WebResponseDto<List<AddressResponseDto>>>() {
+                            new TypeReference<Response<List<AddressResponseDto>>>() {
                             });
 
-                    assertEquals(ResponseStatus.SUCCESS, response.getStatus());
+                    assertEquals(HttpStatus.OK, response.getStatusCode());
                     assertEquals(2, response.getData().size());
                 });
     }
@@ -237,12 +237,12 @@ public class AddressControllerTest extends BaseIntegrationTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(result -> {
-                    WebResponseDto<List<AddressResponseDto>> response = objectMapper.readValue(
+                    Response<List<AddressResponseDto>> response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<WebResponseDto<List<AddressResponseDto>>>() {
+                            new TypeReference<Response<List<AddressResponseDto>>>() {
                             });
 
-                    assertEquals(ResponseStatus.SUCCESS, response.getStatus());
+                    assertEquals(HttpStatus.OK, response.getStatusCode());
                     assertTrue(response.getData().isEmpty());
                 });
     }
@@ -260,16 +260,16 @@ public class AddressControllerTest extends BaseIntegrationTest {
                 .param("size", "10"))
                 .andExpect(status().isOk())
                 .andDo(result -> {
-                    WebResponseDto<List<AddressResponseDto>> response = objectMapper.readValue(
+                    Response<List<AddressResponseDto>> response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<WebResponseDto<List<AddressResponseDto>>>() {
+                            new TypeReference<Response<List<AddressResponseDto>>>() {
                             });
 
                     assertEquals(10, response.getData().size());
-                    assertNotNull(response.getPaging());
-                    assertEquals(0, response.getPaging().getCurrentPage());
-                    assertEquals(2, response.getPaging().getTotalPage()); // 15 items / size 10 -> 2 pages
-                    assertEquals(10, response.getPaging().getSize());
+                    assertNotNull(response.getPagination());
+                    assertEquals(0, response.getPagination().getPage());
+                    assertEquals(2, response.getPagination().getTotalPages()); // 15 items / size 10 -> 2 pages
+                    assertEquals(10, response.getPagination().getSize());
                 });
     }
 
@@ -286,13 +286,13 @@ public class AddressControllerTest extends BaseIntegrationTest {
                 .param("size", "10"))
                 .andExpect(status().isOk())
                 .andDo(result -> {
-                    WebResponseDto<List<AddressResponseDto>> response = objectMapper.readValue(
+                    Response<List<AddressResponseDto>> response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<WebResponseDto<List<AddressResponseDto>>>() {
+                            new TypeReference<Response<List<AddressResponseDto>>>() {
                             });
 
                     assertEquals(5, response.getData().size()); // remaining 5 of 15
-                    assertEquals(1, response.getPaging().getCurrentPage());
+                    assertEquals(1, response.getPagination().getPage());
                 });
     }
 
@@ -307,14 +307,14 @@ public class AddressControllerTest extends BaseIntegrationTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(result -> {
-                    WebResponseDto<List<AddressResponseDto>> response = objectMapper.readValue(
+                    Response<List<AddressResponseDto>> response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<WebResponseDto<List<AddressResponseDto>>>() {
+                            new TypeReference<Response<List<AddressResponseDto>>>() {
                             });
 
                     assertEquals(3, response.getData().size());
-                    assertEquals(0, response.getPaging().getCurrentPage()); // default page = 0
-                    assertEquals(10, response.getPaging().getSize()); // default size = 10
+                    assertEquals(0, response.getPagination().getPage()); // default page = 0
+                    assertEquals(10, response.getPagination().getSize()); // default size = 10
                 });
     }
 
@@ -327,12 +327,12 @@ public class AddressControllerTest extends BaseIntegrationTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andDo(result -> {
-                    WebResponseDto<String> response = objectMapper.readValue(
+                    Response<String> response = objectMapper.readValue(
                             result.getResponse().getContentAsString(),
-                            new TypeReference<WebResponseDto<String>>() {
+                            new TypeReference<Response<String>>() {
                             });
 
-                    assertEquals(ResponseStatus.ERROR, response.getStatus());
+                    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
                 });
     }
 

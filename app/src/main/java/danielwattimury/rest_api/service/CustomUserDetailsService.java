@@ -2,10 +2,10 @@ package danielwattimury.rest_api.service;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import danielwattimury.rest_api.entity.User;
+import danielwattimury.rest_api.exceptions.ResourceNotFoundException;
 import danielwattimury.rest_api.repository.UserRepository;
 import danielwattimury.rest_api.security.UserPrincipal;
 
@@ -19,9 +19,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws ResourceNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return new UserPrincipal(user);
     }

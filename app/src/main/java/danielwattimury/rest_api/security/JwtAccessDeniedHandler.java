@@ -7,8 +7,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import danielwattimury.rest_api.dto.WebResponseDto;
-import danielwattimury.rest_api.enums.ResponseStatus;
+import danielwattimury.rest_api.responses.Response;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import tools.jackson.databind.ObjectMapper;
@@ -26,10 +25,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response,
             AccessDeniedException accessDeniedException) throws IOException {
 
-        WebResponseDto<String> body = WebResponseDto.<String>builder()
-                .status(ResponseStatus.ERROR)
-                .message("Forbidden: " + accessDeniedException.getMessage())
-                .build();
+        Response<Void> body = Response.failedResponse("Forbidden: " + accessDeniedException.getMessage());
 
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

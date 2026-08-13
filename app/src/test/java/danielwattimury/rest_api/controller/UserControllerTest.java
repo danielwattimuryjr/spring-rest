@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import danielwattimury.rest_api.BaseIntegrationTest;
@@ -16,9 +17,8 @@ import danielwattimury.rest_api.dto.UserResponseDto;
 import danielwattimury.rest_api.dto.LoginRequestDto;
 import danielwattimury.rest_api.dto.LoginResponseDto;
 import danielwattimury.rest_api.dto.PatchUserDto;
-import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.entity.User;
-import danielwattimury.rest_api.enums.ResponseStatus;
+import danielwattimury.rest_api.responses.Response;
 import tools.jackson.core.type.TypeReference;
 
 @SpringBootTest
@@ -47,9 +47,9 @@ public class UserControllerTest extends BaseIntegrationTest {
         loginRequest.setPassword("password123");
 
         mockLoginRequest(loginRequest).andExpect(status().isOk()).andDo(result -> {
-            WebResponseDto<LoginResponseDto> response = objectMapper.readValue(
+            Response<LoginResponseDto> response = objectMapper.readValue(
                     result.getResponse().getContentAsString(),
-                    new TypeReference<WebResponseDto<LoginResponseDto>>() {
+                    new TypeReference<Response<LoginResponseDto>>() {
                     });
 
             mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/users/current")
@@ -57,9 +57,9 @@ public class UserControllerTest extends BaseIntegrationTest {
                     .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andDo(currentUserResult -> {
-                        WebResponseDto<UserResponseDto> currentUserResponse = objectMapper.readValue(
+                        Response<UserResponseDto> currentUserResponse = objectMapper.readValue(
                                 currentUserResult.getResponse().getContentAsString(),
-                                new TypeReference<WebResponseDto<UserResponseDto>>() {
+                                new TypeReference<Response<UserResponseDto>>() {
                                 });
 
                         assertEquals(loginRequest.getUsername(), currentUserResponse.getData().getUsername());
@@ -76,9 +76,9 @@ public class UserControllerTest extends BaseIntegrationTest {
         loginRequest.setPassword("password123");
 
         mockLoginRequest(loginRequest).andExpect(status().isOk()).andDo(result -> {
-            WebResponseDto<LoginResponseDto> response = objectMapper.readValue(
+            Response<LoginResponseDto> response = objectMapper.readValue(
                     result.getResponse().getContentAsString(),
-                    new TypeReference<WebResponseDto<LoginResponseDto>>() {
+                    new TypeReference<Response<LoginResponseDto>>() {
                     });
 
             PatchUserDto request = new PatchUserDto();
@@ -93,12 +93,12 @@ public class UserControllerTest extends BaseIntegrationTest {
                     .content(jsonRequest))
                     .andExpect(status().isOk())
                     .andDo(currentUserResult -> {
-                        WebResponseDto<UserResponseDto> currentUserResponse = objectMapper.readValue(
+                        Response<UserResponseDto> currentUserResponse = objectMapper.readValue(
                                 currentUserResult.getResponse().getContentAsString(),
-                                new TypeReference<WebResponseDto<UserResponseDto>>() {
+                                new TypeReference<Response<UserResponseDto>>() {
                                 });
 
-                        assertEquals(ResponseStatus.SUCCESS, currentUserResponse.getStatus());
+                        assertEquals(HttpStatus.OK, currentUserResponse.getStatusCode());
                         assertEquals(loginRequest.getUsername(), currentUserResponse.getData().getUsername());
                         assertEquals("john_doe_updated", currentUserResponse.getData().getName());
                     });

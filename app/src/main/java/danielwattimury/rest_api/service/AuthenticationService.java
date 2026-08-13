@@ -19,6 +19,7 @@ import danielwattimury.rest_api.entity.RefreshToken;
 import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.RoleEnum;
+import danielwattimury.rest_api.exceptions.ResourceNotFoundException;
 import danielwattimury.rest_api.repository.RefreshTokenRepository;
 import danielwattimury.rest_api.repository.RoleRepository;
 import danielwattimury.rest_api.repository.UserRepository;
@@ -80,9 +81,8 @@ public class AuthenticationService {
 
         TokenPair tokens = generateTokens(authentication.getName(), principal.getUserId());
 
-        User userEntity = userRepository.findById(principal.getUserId()).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User not found"));
+        User userEntity = userRepository.findById(principal.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         RefreshToken refreshTokenEntity = new RefreshToken();
         refreshTokenEntity.setToken(tokens.refreshToken.token());
@@ -101,9 +101,7 @@ public class AuthenticationService {
     @Transactional
     public LoginResponseDto refreshToken(String refreshToken) {
         RefreshToken existingRefreshToken = refreshTokenRepository.findFirstByToken(refreshToken)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (existingRefreshToken.isRevoked() || existingRefreshToken.getExpiresAt().isBefore(Instant.now())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is invalid or expired");
@@ -143,8 +141,7 @@ public class AuthenticationService {
         }
 
         Role optionalRole = roleRepository.findByName(RoleEnum.USER)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Role with name: " + RoleEnum.USER + " is not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role with name: " + RoleEnum.USER + " is not found"));
 
         User user = new User();
         user.setUsername(request.getUsername());
@@ -163,9 +160,7 @@ public class AuthenticationService {
     @Transactional
     public void logout(String refreshToken) {
         RefreshToken existingRefreshToken = refreshTokenRepository.findFirstByToken(refreshToken)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (existingRefreshToken.isRevoked() || existingRefreshToken.getExpiresAt().isBefore(Instant.now())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is invalid or expired");

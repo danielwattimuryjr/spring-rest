@@ -14,18 +14,18 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import danielwattimury.rest_api.BaseIntegrationTest;
 import danielwattimury.rest_api.constants.ApiConstants;
 import danielwattimury.rest_api.dto.ContactRequestDto;
 import danielwattimury.rest_api.dto.ContactResponseDto;
-import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.entity.Contact;
 import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
-import danielwattimury.rest_api.enums.ResponseStatus;
 import danielwattimury.rest_api.enums.RoleEnum;
+import danielwattimury.rest_api.responses.Response;
 import tools.jackson.core.type.TypeReference;
 
 public class ContactControllerTest extends BaseIntegrationTest {
@@ -76,12 +76,12 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(postContactRequest)))
                                 .andExpect(status().isBadRequest())
                                 .andDo(result -> {
-                                        WebResponseDto<Map<String, String>> response = objectMapper.readValue(
+                                        Response<Map<String, String>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<Map<String, String>>>() {
+                                                        new TypeReference<Response<Map<String, String>>>() {
                                                         });
 
-                                        assertEquals(ResponseStatus.ERROR, response.getStatus());
+                                        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
                                         assertTrue(response.getData().containsKey("email"));
                                         assertTrue(response.getData().containsKey("firstName"));
                                 });
@@ -149,12 +149,12 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .header("Authorization", "Bearer " + token))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<ContactResponseDto> response = objectMapper.readValue(
+                                        Response<ContactResponseDto> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<ContactResponseDto>>() {
+                                                        new TypeReference<Response<ContactResponseDto>>() {
                                                         });
 
-                                        assertEquals(ResponseStatus.SUCCESS, response.getStatus());
+                                        assertEquals(HttpStatus.OK, response.getStatusCode());
                                         assertEquals(
                                                         "Contact retrieved successfully",
                                                         response.getMessage());
@@ -174,7 +174,7 @@ public class ContactControllerTest extends BaseIntegrationTest {
 
                 mockMvc.perform(delete(ApiConstants.API_BASE_PATH + "/contacts/" + savedContact.getId())
                                 .header("Authorization", "Bearer " + token))
-                                .andExpect(status().isNoContent());
+                                .andExpect(status().isOk());
 
                 assertFalse(contactRepository.existsById(savedContact.getId()));
         }
@@ -189,12 +189,12 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<List<ContactResponseDto>> response = objectMapper.readValue(
+                                        Response<List<ContactResponseDto>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<List<ContactResponseDto>>>() {
+                                                        new TypeReference<Response<List<ContactResponseDto>>>() {
                                                         });
 
-                                        assertEquals(ResponseStatus.SUCCESS, response.getStatus());
+                                        assertEquals(HttpStatus.OK, response.getStatusCode());
                                         assertEquals(2, response.getData().size());
                                 });
         }
@@ -210,9 +210,9 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .param("name", "Jane"))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<List<ContactResponseDto>> response = objectMapper.readValue(
+                                        Response<List<ContactResponseDto>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<List<ContactResponseDto>>>() {
+                                                        new TypeReference<Response<List<ContactResponseDto>>>() {
                                                         });
 
                                         assertEquals(1, response.getData().size());
@@ -232,9 +232,9 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .param("name", "Smith"))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<List<ContactResponseDto>> response = objectMapper.readValue(
+                                        Response<List<ContactResponseDto>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<List<ContactResponseDto>>>() {
+                                                        new TypeReference<Response<List<ContactResponseDto>>>() {
                                                         });
 
                                         assertEquals(1, response.getData().size());
@@ -253,9 +253,9 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .param("email", "john@"))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<List<ContactResponseDto>> response = objectMapper.readValue(
+                                        Response<List<ContactResponseDto>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<List<ContactResponseDto>>>() {
+                                                        new TypeReference<Response<List<ContactResponseDto>>>() {
                                                         });
 
                                         assertEquals(1, response.getData().size());
@@ -274,9 +274,9 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .param("phone", "0822"))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<List<ContactResponseDto>> response = objectMapper.readValue(
+                                        Response<List<ContactResponseDto>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<List<ContactResponseDto>>>() {
+                                                        new TypeReference<Response<List<ContactResponseDto>>>() {
                                                         });
 
                                         assertEquals(1, response.getData().size());
@@ -294,9 +294,9 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .param("name", "Nonexistent"))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<List<ContactResponseDto>> response = objectMapper.readValue(
+                                        Response<List<ContactResponseDto>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<List<ContactResponseDto>>>() {
+                                                        new TypeReference<Response<List<ContactResponseDto>>>() {
                                                         });
 
                                         assertEquals(0, response.getData().size());
@@ -316,9 +316,9 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .param("size", "10"))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<List<ContactResponseDto>> response = objectMapper.readValue(
+                                        Response<List<ContactResponseDto>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<List<ContactResponseDto>>>() {
+                                                        new TypeReference<Response<List<ContactResponseDto>>>() {
                                                         });
 
                                         assertEquals(10, response.getData().size());
@@ -338,9 +338,9 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .param("size", "10"))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<List<ContactResponseDto>> response = objectMapper.readValue(
+                                        Response<List<ContactResponseDto>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<List<ContactResponseDto>>>() {
+                                                        new TypeReference<Response<List<ContactResponseDto>>>() {
                                                         });
 
                                         assertEquals(5, response.getData().size()); // remaining 5 of 15
@@ -359,9 +359,9 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<List<ContactResponseDto>> response = objectMapper.readValue(
+                                        Response<List<ContactResponseDto>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<List<ContactResponseDto>>>() {
+                                                        new TypeReference<Response<List<ContactResponseDto>>>() {
                                                         });
 
                                         assertEquals(3, response.getData().size());
@@ -394,9 +394,9 @@ public class ContactControllerTest extends BaseIntegrationTest {
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<List<ContactResponseDto>> response = objectMapper.readValue(
+                                        Response<List<ContactResponseDto>> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<List<ContactResponseDto>>>() {
+                                                        new TypeReference<Response<List<ContactResponseDto>>>() {
                                                         });
 
                                         assertEquals(1, response.getData().size());

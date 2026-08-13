@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -23,10 +24,9 @@ import danielwattimury.rest_api.dto.LoginRequestDto;
 import danielwattimury.rest_api.dto.LoginResponseDto;
 import danielwattimury.rest_api.dto.RegisterRequestDto;
 import danielwattimury.rest_api.dto.UserResponseDto;
-import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.entity.RefreshToken;
 import danielwattimury.rest_api.entity.User;
-import danielwattimury.rest_api.enums.ResponseStatus;
+import danielwattimury.rest_api.responses.Response;
 import tools.jackson.core.type.TypeReference;
 
 @SpringBootTest
@@ -58,14 +58,14 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .content(jsonRequest))
                                 .andExpectAll(
-                                                status().isOk())
+                                                status().isCreated())
                                 .andDo(result -> {
-                                        WebResponseDto<UserResponseDto> response = objectMapper.readValue(
+                                        Response<UserResponseDto> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<UserResponseDto>>() {
+                                                        new TypeReference<Response<UserResponseDto>>() {
                                                         });
 
-                                        assertEquals(ResponseStatus.SUCCESS, response.getStatus());
+                                        assertEquals(HttpStatus.CREATED, response.getStatusCode());
                                         assertEquals("Jane Doe", response.getData().getName());
                                         assertEquals("jane_doe", response.getData().getUsername());
                                 });
@@ -122,12 +122,12 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andDo(result -> {
-                                        WebResponseDto<LoginResponseDto> response = objectMapper.readValue(
+                                        Response<LoginResponseDto> response = objectMapper.readValue(
                                                         result.getResponse().getContentAsString(),
-                                                        new TypeReference<WebResponseDto<LoginResponseDto>>() {
+                                                        new TypeReference<Response<LoginResponseDto>>() {
                                                         });
 
-                                        assertEquals(ResponseStatus.SUCCESS, response.getStatus());
+                                        assertEquals(HttpStatus.OK, response.getStatusCode());
                                         assertNotNull(response.getData().getAccessToken());
                                         assertNotNull(response.getData().getRefreshToken());
 
@@ -150,9 +150,9 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                                 .andExpect(status().isOk())
                                 .andReturn();
 
-                WebResponseDto<LoginResponseDto> response = objectMapper.readValue(
+                Response<LoginResponseDto> response = objectMapper.readValue(
                                 result.getResponse().getContentAsString(),
-                                new TypeReference<WebResponseDto<LoginResponseDto>>() {
+                                new TypeReference<Response<LoginResponseDto>>() {
                                 });
 
                 // old token: must now be revoked

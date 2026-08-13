@@ -17,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import danielwattimury.rest_api.constants.ApiConstants;
 import danielwattimury.rest_api.dto.LoginRequestDto;
 import danielwattimury.rest_api.dto.LoginResponseDto;
-import danielwattimury.rest_api.dto.WebResponseDto;
 import danielwattimury.rest_api.entity.Role;
 import danielwattimury.rest_api.entity.User;
 import danielwattimury.rest_api.enums.RoleEnum;
@@ -26,6 +25,7 @@ import danielwattimury.rest_api.repository.ContactRepository;
 import danielwattimury.rest_api.repository.RefreshTokenRepository;
 import danielwattimury.rest_api.repository.RoleRepository;
 import danielwattimury.rest_api.repository.UserRepository;
+import danielwattimury.rest_api.responses.Response;
 import danielwattimury.rest_api.security.JwtService;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -99,9 +99,9 @@ public abstract class BaseIntegrationTest {
                                 .andExpect(status().isOk())
                                 .andReturn();
 
-                WebResponseDto<LoginResponseDto> response = objectMapper.readValue(
+                Response<LoginResponseDto> response = objectMapper.readValue(
                                 result.getResponse().getContentAsString(),
-                                new TypeReference<WebResponseDto<LoginResponseDto>>() {
+                                new TypeReference<Response<LoginResponseDto>>() {
                                 });
 
                 return response.getData();

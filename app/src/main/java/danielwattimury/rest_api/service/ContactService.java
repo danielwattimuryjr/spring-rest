@@ -9,15 +9,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import danielwattimury.rest_api.dto.ContactRequestDto;
 import danielwattimury.rest_api.dto.ContactResponseDto;
 import danielwattimury.rest_api.dto.ContactSearchDto;
 import danielwattimury.rest_api.entity.Contact;
 import danielwattimury.rest_api.entity.User;
+import danielwattimury.rest_api.exceptions.ResourceNotFoundException;
 import danielwattimury.rest_api.repository.ContactRepository;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
@@ -71,8 +70,7 @@ public class ContactService {
 
                 Contact contact = contactRepository
                                 .findByIdAndUserId(contactId, userId)
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                                "Contact not found"));
+                                .orElseThrow(() -> new ResourceNotFoundException("Contact not found"));
 
                 contact.setFirstName(request.getFirstName());
                 contact.setLastName(request.getLastName());
@@ -86,8 +84,7 @@ public class ContactService {
         public ContactResponseDto getContactById(Integer userId, Integer contactId) {
                 Contact contact = contactRepository
                                 .findByIdAndUserId(contactId, userId)
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                                "Contact not found"));
+                                .orElseThrow(() -> new ResourceNotFoundException("Contact not found"));
 
                 return toContactResponse(contact);
         }
@@ -96,8 +93,7 @@ public class ContactService {
         public void deleteContactById(Integer userId, Integer contactId) {
                 Contact contact = contactRepository
                                 .findByIdAndUserId(contactId, userId)
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                                "Contact not found"));
+                                .orElseThrow(() -> new ResourceNotFoundException("Contact not found"));
 
                 contactRepository.delete(contact);
         }
