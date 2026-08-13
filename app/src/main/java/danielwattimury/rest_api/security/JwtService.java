@@ -36,17 +36,17 @@ public class JwtService {
         }
     }
 
-    public record JWTToken(
+    public record JwtToken(
             String token,
             Instant expiresAt) {
     }
 
-    public JWTToken generateToken(String username, String userId) {
+    public JwtToken generateToken(String username, String userId) {
         Instant expiration = Instant.now().plus(30, ChronoUnit.MINUTES);
         return generateToken(username, userId, expiration);
     }
 
-    public JWTToken generateToken(String username, String userId, Instant expiration) {
+    public JwtToken generateToken(String username, String userId, Instant expiration) {
         Instant now = Instant.now();
         Map<String, Object> claims = new HashMap<>();
 
@@ -62,7 +62,7 @@ public class JwtService {
                 .signWith(getKey())
                 .compact();
 
-        return new JWTToken(token, expiration);
+        return new JwtToken(token, expiration);
     }
 
     private SecretKey getKey() {

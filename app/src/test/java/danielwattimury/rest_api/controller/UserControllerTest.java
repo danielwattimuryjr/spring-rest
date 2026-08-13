@@ -53,7 +53,7 @@ public class UserControllerTest extends BaseIntegrationTest {
                     });
 
             mockMvc.perform(get(ApiConstants.API_BASE_PATH + "/users/current")
-                    .header("Authorization", "Bearer " + response.getData().getToken())
+                    .header("Authorization", "Bearer " + response.getData().getAccessToken())
                     .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andDo(currentUserResult -> {
@@ -87,7 +87,7 @@ public class UserControllerTest extends BaseIntegrationTest {
             String jsonRequest = objectMapper.writeValueAsString(request);
 
             mockMvc.perform(patch(ApiConstants.API_BASE_PATH + "/users/current")
-                    .header("Authorization", "Bearer " + response.getData().getToken())
+                    .header("Authorization", "Bearer " + response.getData().getAccessToken())
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonRequest))

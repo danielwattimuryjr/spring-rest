@@ -52,3 +52,13 @@ ALTER TABLE users ADD COLUMN role_id INT NOT NULL;
 
 ALTER TABLE users
 ADD CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles (id);
+
+CREATE TABLE refresh_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(512) NOT NULL UNIQUE,
+    user_id INT NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    revoked BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY fk_users_refresh_tokens (user_id) REFERENCES users (id)
+) ENGINE InnoDB;

@@ -70,11 +70,12 @@ public class AuthenticationControllerTest extends BaseIntegrationTest {
                                                         });
 
                                         assertEquals(ResponseStatus.SUCCESS, response.getStatus());
-                                        assertNotNull(response.getData().getToken());
-                                        assertNotNull(response.getData().getTokenExpiredAt());
+                                        assertNotNull(response.getData().getAccessToken());
+                                        assertNotNull(response.getData().getRefreshToken());
+                                        assertNotNull(response.getData().getRefreshTokenExpiresAt());
 
                                         String usernameFromToken = jwtService
-                                                        .extractUsername(response.getData().getToken());
+                                                        .extractUsername(response.getData().getAccessToken());
                                         assertEquals(loginRequest.getUsername(), usernameFromToken);
                                 });
         }

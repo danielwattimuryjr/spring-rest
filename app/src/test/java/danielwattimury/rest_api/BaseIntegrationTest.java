@@ -97,6 +97,6 @@ public abstract class BaseIntegrationTest {
                                 new TypeReference<WebResponseDto<LoginResponseDto>>() {
                                 });
 
-                return response.getData().getToken();
+                return response.getData().getAccessToken();
         }
 }
